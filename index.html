@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TomasekPlays - Epic Game Zone 🎮</title>
+    <script>
+        // Hides 'games.html' from the URL address bar immediately upon loading
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState(null, "", window.location.pathname.replace(/games\.html$/, ""));
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .stars, .stars2 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .stars {
+            background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVQIW2P4//8/AxYMRgYGADigBAz5p6RnAAAAAElFTkSuQmCC') repeat;
+            animation: animateStars 50s linear infinite;
+        }
+
+        .stars2 {
+            background: transparent url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2P4//8/AwAI/AL+hc2rNAAAAABJRU5ErkJggg==') repeat;
+            animation: animateStars 100s linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes animateStars {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-2000px); }
+        }
+
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-box {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: slideIn 0.5s;
+        }
+
+        @keyframes slideIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .login-box h2 {
+            font-size: 2.2rem;
+            margin-bottom: 20px;
+        }
+
+        .login-box p {
+            margin-bottom: 25px;
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .device-selection {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .device-btn {
+            flex: 1;
+            padding: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .device-btn:hover {
+            transform: scale(1.05);
+            border-color: #667eea;
+        }
+
+        .device-btn.selected {
+            border-color: #00ff88;
+            background: rgba(0, 255, 136, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #052211;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: transform 0.2s;
+        }
+
+        .login-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .top-bar-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .friends-btn, .notifications-btn, .social-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            color: white;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .social-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .youtube-btn:hover {
+            border-color: #ff0000;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.5);
+        }
+
+        .instagram-btn:hover {
+            border-color: #E1306C;
+            box-shadow: 0 0 15px rgba(225, 48, 108, 0.5);
+        }
+
+        .discord-btn:hover {
+            border-color: #5865F2;
+            box-shadow: 0 0 15px rgba(88, 101, 242, 0.5);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff0000;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .friends-panel, .notifications-panel {
+            position: fixed;
+            top: 70px;
+            right: -400px;
+            width: 350px;
+            height: calc(100% - 70px);
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+            transition: right 0.3s;
+            z-index: 99;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .friends-panel.open, .notifications-panel.open {
+            right: 0;
+        }
+
+        .add-friend-section input {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .add-friend-btn {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .friend-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .online-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #00ff00;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .challenge-btn {
+            padding: 5px 15px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .notification-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .accept-btn, .decline-btn {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .accept-btn {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .decline-btn {
+            background: #ff4444;
+            color: white;
+        }
+
+        header {
+            text-align: center;
+            padding: 100px 20px 20px 20px;
+        }
+
+        .glitch {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: glitch 725ms infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff, 0.025em 0.04em 0 #fffc00; }
+            50% { text-shadow: -0.05em 0 0 #00fffc, 0.025em 0.035em 0 #fc00ff, -0.05em -0.05em 0 #fffc00; }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-top: 10px;
+            animation: colorChange 3s infinite;
+        }
+
+        @keyframes colorChange {
+            0%, 100% { color: #ff6b6b; }
+            25% { color: #4ecdc4; }
+            50% { color: #45b7d1; }
+            75% { color: #f9ca24; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+
+        .game-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .game-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .multiplayer-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: linear-gradient(135deg, #ff00ff 0%, #00ffff 100%);
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .game-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 3% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 40px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #fff;
+        }
+
+        .score {
+            font-size: 1.5rem;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        canvas {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            margin: 20px auto;
+            display: block;
+            max-width: 100%;
+        }
+
+        .controls button {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px;
+        }
+
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .mobile-controls.active {
+            display: block;
+        }
+
+        .dpad {
+            display: grid;
+            grid-template-columns: repeat(3, 70px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .dpad button {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            border-radius: 15px;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #colorGrid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .color-card {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .glitch { font-size: 2rem; }
+            .game-grid { grid-template-columns: 1fr; }
+            .friends-panel, .notifications-panel { width: 100%; right: -100%; }
+            .top-bar-right { gap: 10px; }
+            .social-btn { padding: 8px 15px; font-size: 0.9rem; }
+        }
+
+        .social-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+        }
+
+        .social-modal-content {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            margin: 10% auto;
+            padding: 40px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            animation: slideIn 0.3s;
+        }
+
+        .social-modal h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .social-modal input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .social-modal input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .social-modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .save-social-btn, .cancel-social-btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .save-social-btn {
+            background: linear-gradient(135deg, #00ff88 0%, #00aa55 100%);
+            color: white;
+        }
+
+        .cancel-social-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .save-social-btn:hover, .cancel-social-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .social-info {
+            margin-top: 15px;
+            opacity: 0.8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="stars"></div>
+    <div class="stars2"></div>
+
+    <!-- Device Selection Screen (No login needed) -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2>🎮 Select Device</h2>
+            <p>Choose your controls setup to begin playing!</p>
+            <div class="device-selection">
+                <div class="device-btn selected" id="pcBtn" onclick="selectDevice('pc')">💻<br>PC</div>
+                <div class="device-btn" id="mobileBtn" onclick="selectDevice('mobile')">📱<br>Mobile</div>
+            </div>
+            <button class="login-btn" onclick="startPlay()">Start Playing 🚀</button>
+        </div>
+    </div>
+    
+    <div id="mainContent" style="display: none;">
+        <div class="top-bar">
+            <div><span id="userDisplay">👤 Player (PC)</span></div>
+            <div class="top-bar-right">
+                <button class="social-btn youtube-btn" onclick="openSocialModal('youtube')">
+                    📺 YouTube
+                </button>
+                <button class="social-btn instagram-btn" onclick="openSocialModal('instagram')">
+                    📷 Instagram
+                </button>
+                <button class="social-btn discord-btn" onclick="openSocialModal('discord')">
+                    💬 Discord
+                </button>
+                <button class="notifications-btn" onclick="toggleNotifications()">
+                    🔔 Notifications
+                    <span class="notification-badge" id="notificationBadge">0</span>
+                </button>
+                <button class="friends-btn" onclick="toggleFriends()">👥 Friends</button>
+            </div>
+        </div>
+
+        <div class="friends-panel" id="friendsPanel">
+            <h3>Friends List</h3>
+            <div class="add-friend-section">
+                <input type="text" id="friendUsername" placeholder="Friend's username">
+                <button class="add-friend-btn" onclick="sendFriendRequest()">Send Request</button>
+            </div>
+            <div id="friendsList" style="margin-top: 20px;">
+                <p style="opacity: 0.7;">No friends yet!</p>
+            </div>
+        </div>
+
+        <div class="notifications-panel" id="notificationsPanel">
+            <h3>Notifications</h3>
+            <div id="notificationsList">
+                <p style="opacity: 0.7;">No notifications</p>
+            </div>
+        </div>
+        
+        <header>
+            <p id="welcomeMsg">Welcome, Gamer! 🎮</p>
+            <h1 class="glitch">🎮 TOMASEKPLAYS ZONE 🎮</h1>
+            <p class="subtitle">Choose Your Adventure!</p>
+        </header>
+
+        <div class="container">
+            <div class="game-grid">
+                <div class="game-card" onclick="showGame('snake')">
+                    <h2>🐍 Snake</h2>
+                    <p>Rainbow snake game!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('flappy')">
+                    <h2>🐦 Flappy Bird</h2>
+                    <p>Fly through pipes!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('colormatch')">
+                    <h2>🎨 Color Match</h2>
+                    <p>Memory game!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('breakout')">
+                    <h2>🧱 Breakout</h2>
+                    <p>Break bricks!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('pong')">
+                    <span class="multiplayer-badge">1v1</span>
+                    <h2>🏓 Pong</h2>
+                    <p>Classic pong!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('shooter')">
+                    <h2>🚀 Shooter</h2>
+                    <p>Shoot aliens!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('racing')">
+                    <span class="multiplayer-badge">1v1</span>
+                    <h2>🏎️ Racing</h2>
+                    <p>Dodge cars!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('tictactoe')">
+                    <span class="multiplayer-badge">1v1</span>
+                    <h2>⭕ Tic Tac Toe</h2>
+                    <p>Classic X and O!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('platformer')">
+                    <h2>🦸 Platformer</h2>
+                    <p>Jump & collect!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+
+                <div class="game-card" onclick="showGame('maze')">
+                    <h2>🌀 Maze</h2>
+                    <p>Find the exit!</p>
+                    <button class="play-btn">PLAY</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Modals -->
+    <div id="youtubeModal" class="social-modal">
+        <div class="social-modal-content">
+            <h2>📺 YouTube Channel</h2>
+            <p>Enter your YouTube channel URL or username:</p>
+            <input type="text" id="youtubeInput" placeholder="e.g., @YourChannel or youtube.com/c/YourChannel">
+            <div class="social-modal-buttons">
+                <button class="save-social-btn" onclick="saveSocial('youtube')">Save & Visit</button>
+                <button class="cancel-social-btn" onclick="closeSocialModal('youtube')">Cancel</button>
+            </div>
+            <p class="social-info" id="youtubeInfo"></p>
+        </div>
+    </div>
+
+    <div id="instagramModal" class="social-modal">
+        <div class="social-modal-content">
+            <h2>📷 Instagram</h2>
+            <p>Enter your Instagram username:</p>
+            <input type="text" id="instagramInput" placeholder="e.g., @yourusername">
+            <div class="social-modal-buttons">
+                <button class="save-social-btn" onclick="saveSocial('instagram')">Save & Visit</button>
+                <button class="cancel-social-btn" onclick="closeSocialModal('instagram')">Cancel</button>
+            </div>
+            <p class="social-info" id="instagramInfo"></p>
+        </div>
+    </div>
+
+    <div id="discordModal" class="social-modal">
+        <div class="social-modal-content">
+            <h2>💬 Discord</h2>
+            <p>Enter your Discord invite link or server:</p>
+            <input type="text" id="discordInput" placeholder="e.g., discord.gg/yourserver">
+            <div class="social-modal-buttons">
+                <button class="save-social-btn" onclick="saveSocial('discord')">Save & Visit</button>
+                <button class="cancel-social-btn" onclick="closeSocialModal('discord')">Cancel</button>
+            </div>
+            <p class="social-info" id="discordInfo"></p>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <div id="snake" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('snake')">&times;</span>
+            <h2>🐍 Snake Game</h2>
+            <p class="score">Score: <span id="snakeScore">0</span></p>
+            <canvas id="snakeCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">Arrow Keys / WASD</p>
+                <button onclick="restartSnake()">Restart</button>
+            </div>
+            <div class="mobile-controls" id="snakeMobile">
+                <div class="dpad">
+                    <div></div><button onclick="snakeMove('up')">⬆️</button><div></div>
+                    <button onclick="snakeMove('left')">⬅️</button><div></div><button onclick="snakeMove('right')">➡️</button><div></div><button onclick="snakeMove('down')">⬇️</button><div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="flappy" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('flappy')">&times;</span>
+            <h2>🐦 Flappy Bird</h2>
+            <p class="score">Score: <span id="flappyScore">0</span></p>
+            <canvas id="flappyCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">SPACE or Click to Flap</p>
+                <button onclick="restartFlappy()">Restart</button>
+            </div>
+            <div class="mobile-controls" id="flappyMobile">
+                <button class="action-btn" style="width: 150px; height: 150px; font-size: 2rem;" onclick="flappyFlap()">TAP<br>TO<br>FLAP</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="colormatch" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('colormatch')">&times;</span>
+            <h2>🎨 Color Match</h2>
+            <p class="score">Moves: <span id="colorMoves">0</span> | Matches: <span id="colorMatches">0</span></p>
+            <div id="colorGrid"></div>
+            <div class="controls">
+                <button onclick="restartColorMatch()">New Game</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="breakout" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('breakout')">&times;</span>
+            <h2>🧱 Breakout</h2>
+            <p class="score">Score: <span id="breakoutScore">0</span> | Lives: <span id="breakoutLives">3</span></p>
+            <canvas id="breakoutCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">Mouse / Arrow Keys</p>
+                <button onclick="restartBreakout()">Restart</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="pong" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('pong')">&times;</span>
+            <h2>🏓 Pong</h2>
+            <p class="score">You: <span id="pongScoreP1">0</span> | AI: <span id="pongScoreP2">0</span></p>
+            <canvas id="pongCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">W/S or Up/Down</p>
+                <button onclick="restartPong()">Restart</button>
+                <button onclick="challengeToGame('pong')">Challenge Friend</button>
+            </div>
+            <div class="mobile-controls" id="pongMobile">
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="pongMove('up')">⬆️</button>
+                    <button class="action-btn" onclick="pongMove('down')">⬇️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shooter" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('shooter')">&times;</span>
+            <h2>🚀 Space Shooter</h2>
+            <p class="score">Score: <span id="shooterScore">0</span> | Lives: <span id="shooterLives">3</span></p>
+            <canvas id="shooterCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">Arrows to move, SPACE to shoot</p>
+                <button onclick="restartShooter()">Restart</button>
+            </div>
+            <div class="mobile-controls" id="shooterMobile">
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="shooterMove('left')">⬅️</button>
+                    <button class="action-btn" onclick="shooterShoot()">🔥</button>
+                    <button class="action-btn" onclick="shooterMove('right')">➡️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="racing" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('racing')">&times;</span>
+            <h2>🏎️ Racing</h2>
+            <p class="score">Distance: <span id="racingScore">0</span>m</p>
+            <canvas id="racingCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">Arrow Keys</p>
+                <button onclick="restartRacing()">Restart</button>
+                <button onclick="challengeToGame('racing')">Challenge Friend</button>
+            </div>
+            <div class="mobile-controls" id="racingMobile">
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="racingMove('left')">⬅️</button>
+                    <button class="action-btn" onclick="racingMove('right')">➡️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tictactoe" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('tictactoe')">&times;</span>
+            <h2>⭕ Tic Tac Toe</h2>
+            <p class="score" id="tttStatus">Player X's Turn</p>
+            <div id="tttBoard" style="display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; justify-content: center; margin: 20px;"></div>
+            <div class="controls">
+                <button onclick="restartTicTacToe()">New Game</button>
+                <button onclick="challengeToGame('tictactoe')">Challenge Friend</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="platformer" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('platformer')">&times;</span>
+            <h2>🦸 Platformer</h2>
+            <p class="score">Coins: <span id="platformerScore">0</span></p>
+            <canvas id="platformerCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">Arrows to move, SPACE to jump</p>
+                <button onclick="restartPlatformer()">Restart</button>
+            </div>
+            <div class="mobile-controls" id="platformerMobile">
+                <div class="action-buttons">
+                    <button class="action-btn" onclick="platformerMove('left')">⬅️</button>
+                    <button class="action-btn" onclick="platformerJump()">⬆️<br>JUMP</button>
+                    <button class="action-btn" onclick="platformerMove('right')">➡️</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="maze" class="game-modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeGame('maze')">&times;</span>
+            <h2>🌀 Maze Runner</h2>
+            <p class="score">Time: <span id="mazeTime">0</span>s</p>
+            <canvas id="mazeCanvas"></canvas>
+            <div class="controls">
+                <p class="pc-only">Arrow Keys / WASD</p>
+                <button onclick="restartMaze()">New Maze</button>
+            </div>
+            <div class="mobile-controls" id="mazeMobile">
+                <div class="dpad">
+                    <div></div><button onclick="mazeMove('up')">⬆️</button><div></div>
+                    <button onclick="mazeMove('left')">⬅️</button><div></div><button onclick="mazeMove('right')">➡️</button><div></div><button onclick="mazeMove('down')">⬇️</button><div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDevice = 'pc';
+        let friends = [];
+        let notifications = [];
+        let onlineUsers = ['Player1', 'GamerX', 'ProGamer99'];
+        let socialLinks = {
+            youtube: '',
+            instagram: '',
+            discord: ''
+        };
+
+        function loadSocialLinks() {
+            const saved = localStorage.getItem('socialLinks');
+            if (saved) {
+                socialLinks = JSON.parse(saved);
+            }
+        }
+
+        function openSocialModal(platform) {
+            const modal = document.getElementById(platform + 'Modal');
+            modal.style.display = 'block';
+            
+            if (socialLinks[platform]) {
+                document.getElementById(platform + 'Input').value = socialLinks[platform];
+                document.getElementById(platform + 'Info').textContent = `Current: ${socialLinks[platform]}`;
+            }
+        }
+
+        function closeSocialModal(platform) {
+            document.getElementById(platform + 'Modal').style.display = 'none';
+        }
+
+        function saveSocial(platform) {
+            const input = document.getElementById(platform + 'Input').value.trim();
+            
+            if (!input) {
+                alert('Please enter a valid link!');
+                return;
+            }
+
+            let url = input;
+
+            if (platform === 'youtube') {
+                if (input.startsWith('@')) {
+                    url = `https://youtube.com/${input}`;
+                } else if (!input.startsWith('http')) {
+                    url = `https://youtube.com/c/${input}`;
+                }
+            } else if (platform === 'instagram') {
+                const username = input.replace('@', '');
+                url = `https://instagram.com/${username}`;
+            } else if (platform === 'discord') {
+                if (!input.startsWith('http')) {
+                    url = `https://discord.gg/${input.replace('discord.gg/', '')}`;
+                }
+            }
+
+            socialLinks[platform] = input;
+            localStorage.setItem('socialLinks', JSON.stringify(socialLinks));
+
+            window.open(url, '_blank');
+            closeSocialModal(platform);
+            
+            alert(`${platform.charAt(0).toUpperCase() + platform.slice(1)} link saved!`);
+        }
+
+        window.onclick = function(event) {
+            if (event.target.classList.contains('social-modal')) {
+                event.target.style.display = 'none';
+            }
+        };
+
+        function selectDevice(device) {
+            currentDevice = device;
+            document.getElementById('pcBtn').classList.remove('selected');
+            document.getElementById('mobileBtn').classList.remove('selected');
+            document.getElementById(device + 'Btn').classList.add('selected');
+        }
+
+        function startPlay() {
+            localStorage.setItem('gameDevice', currentDevice);
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('welcomeMsg').textContent = `Welcome, Gamer! 🎮`;
+            document.getElementById('userDisplay').textContent = `👤 Player (${currentDevice.toUpperCase()})`;
+
+            updateMobileControls();
+        }
+
+        function updateMobileControls() {
+            const isMobile = currentDevice === 'mobile';
+            document.querySelectorAll('.mobile-controls').forEach(el => {
+                el.classList.toggle('active', isMobile);
+            });
+            document.querySelectorAll('.pc-only').forEach(el => {
+                el.style.display = isMobile ? 'none' : 'block';
+            });
+        }
+
+        window.onload = function() {
+            loadSocialLinks();
+            
+            const savedDevice = localStorage.getItem('gameDevice');
+            if (savedDevice) {
+                currentDevice = savedDevice;
+                document.getElementById('pcBtn').classList.remove('selected');
+                document.getElementById('mobileBtn').classList.remove('selected');
+                document.getElementById(savedDevice + 'Btn').classList.add('selected');
+            }
+
+            setTimeout(() => {
+                addNotification('GamerX wants to be your friend!', 'friend-request', 'GamerX');
+            }, 5000);
+        };
+
+        function toggleFriends() {
+            const panel = document.getElementById('friendsPanel');
+            panel.classList.toggle('open');
+            document.getElementById('notificationsPanel').classList.remove('open');
+        }
+
+        function toggleNotifications() {
+            const panel = document.getElementById('notificationsPanel');
+            panel.classList.toggle('open');
+            document.getElementById('friendsPanel').classList.remove('open');
+        }
+
+        function sendFriendRequest() {
+            const name = document.getElementById('friendUsername').value.trim();
+            if (!name) return alert('Enter a username!');
+            if (friends.some(f => f.name === name)) return alert('Already friends!');
+            
+            alert(`Friend request sent to ${name}!`);
+            setTimeout(() => {
+                addNotification(`${name} accepted your friend request!`, 'friend-accept', name);
+            }, 2000);
+            document.getElementById('friendUsername').value = '';
+        }
+
+        function addNotification(msg, type, data) {
+            notifications.push({ msg, type, data, id: Date.now() });
+            updateNotificationBadge();
+            renderNotifications();
+        }
+
+        function updateNotificationBadge() {
+            const badge = document.getElementById('notificationBadge');
+            if (notifications.length > 0) {
+                badge.style.display = 'flex';
+                badge.textContent = notifications.length;
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        function renderNotifications() {
+            const container = document.getElementById('notificationsList');
+            if (notifications.length === 0) {
+                container.innerHTML = '<p style="opacity: 0.7;">No notifications</p>';
+                return;
+            }
+
+            container.innerHTML = notifications.map(n => `
+                <div class="notification-item">
+                    <p>${n.msg}</p>
+                    ${n.type === 'friend-request' ? `
+                        <div class="notification-actions">
+                            <button class="accept-btn" onclick="acceptFriend('${n.data}', ${n.id})">Accept</button>
+                            <button class="decline-btn" onclick="declineNotif(${n.id})">Decline</button>
+                        </div>
+                    ` : n.type === 'friend-accept' ? `
+                        <div class="notification-actions">
+                            <button class="accept-btn" onclick="confirmFriend('${n.data}', ${n.id})">OK</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function acceptFriend(name, id) {
+            friends.push({ name, online: onlineUsers.includes(name) });
+            notifications = notifications.filter(n => n.id !== id);
+            updateNotificationBadge();
+            renderNotifications();
+            renderFriends();
+        }
+
+        function confirmFriend(name, id) {
+            friends.push({ name, online: onlineUsers.includes(name) });
+            notifications = notifications.filter(n => n.id !== id);
+            updateNotificationBadge();
+            renderNotifications();
+            renderFriends();
+        }
+
+        function declineNotif(id) {
+            notifications = notifications.filter(n => n.id !== id);
+            updateNotificationBadge();
+            renderNotifications();
+        }
+
+        function renderFriends() {
+            const container = document.getElementById('friendsList');
+            if (friends.length === 0) {
+                container.innerHTML = '<p style="opacity: 0.7;">No friends yet!</p>';
+                return;
+            }
+
+            container.innerHTML = friends.map(f => `
+                <div class="friend-item">
+                    <div>
+                        <span class="${f.online ? 'online-status' : ''}"></span>
+                        ${f.name}
+                    </div>
+                    ${f.online ? `<button class="challenge-btn" onclick="challengeFriend('${f.name}')">1v1</button>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function challengeFriend(name) {
+            alert(`Select a game to challenge ${name}!`);
+        }
+
+        function challengeToGame(game) {
+            if (friends.length === 0) return alert('Add friends first!');
+            const online = friends.filter(f => f.online);
+            if (online.length === 0) return alert('No online friends!');
+            alert(`Challenge sent to ${online[0].name}! They accepted!`);
+        }
+
+        function showGame(id) {
+            document.getElementById(id).style.display = 'block';
+            updateMobileControls();
+            
+            if (id === 'snake') initSnake();
+            if (id === 'flappy') initFlappy();
+            if (id === 'colormatch') initColorMatch();
+            if (id === 'breakout') initBreakout();
+            if (id === 'pong') initPong();
+            if (id === 'shooter') initShooter();
+            if (id === 'racing') initRacing();
+            if (id === 'tictactoe') initTicTacToe();
+            if (id === 'platformer') initPlatformer();
+            if (id === 'maze') initMaze();
+        }
+
+        function closeGame(id) {
+            document.getElementById(id).style.display = 'none';
+            window['stop' + id.charAt(0).toUpperCase() + id.slice(1)] = true;
+        }
+
+        // SNAKE GAME
+        let snakeGame = { running: false, snake: [], food: {}, dx: 0, dy: 0, score: 0 };
+        
+        function snakeMove(dir) {
+            const g = 20;
+            if (dir === 'up' && snakeGame.dy === 0) { snakeGame.dx = 0; snakeGame.dy = -g; }
+            if (dir === 'down' && snakeGame.dy === 0) { snakeGame.dx = 0; snakeGame.dy = g; }
+            if (dir === 'left' && snakeGame.dx === 0) { snakeGame.dx = -g; snakeGame.dy = 0; }
+            if (dir === 'right' && snakeGame.dx === 0) { snakeGame.dx = g; snakeGame.dy = 0; }
+        }
+
+        function initSnake() {
+            const c = document.getElementById('snakeCanvas');
+            c.width = Math.min(400, window.innerWidth - 40);
+            c.height = Math.min(400, window.innerWidth - 40);
+            const ctx = c.getContext('2d');
+            
+            snakeGame = {
+                running: true,
+                snake: [{ x: 200, y: 200 }],
+                food: { x: 100, y: 100 },
+                dx: 20,
+                dy: 0,
+                score: 0
+            };
+            
+            document.getElementById('snakeScore').textContent = 0;
+            
+            document.onkeydown = (e) => {
+                if (e.keyCode === 37 || e.keyCode === 65) snakeMove('left');
+                if (e.keyCode === 38 || e.keyCode === 87) snakeMove('up');
+                if (e.keyCode === 39 || e.keyCode === 68) snakeMove('right');
+                if (e.keyCode === 40 || e.keyCode === 83) snakeMove('down');
+            };
+            
+            function gameLoop() {
+                if (!snakeGame.running) return;
+                
+                const head = { 
+                    x: snakeGame.snake[0].x + snakeGame.dx, 
+                    y: snakeGame.snake[0].y + snakeGame.dy 
+                };
+                
+                if (head.x < 0 || head.x >= c.width || head.y < 0 || head.y >= c.height ||
+                    snakeGame.snake.some(s => s.x === head.x && s.y === head.y)) {
+                    alert(`Game Over! Score: ${snakeGame.score}`);
+                    snakeGame.running = false;
+                    return;
+                }
+                
+                snakeGame.snake.unshift(head);
+                
+                if (head.x === snakeGame.food.x && head.y === snakeGame.food.y) {
+                    snakeGame.score += 10;
+                    document.getElementById('snakeScore').textContent = snakeGame.score;
+                    snakeGame.food = {
+                        x: Math.floor(Math.random() * (c.width / 20)) * 20,
+                        y: Math.floor(Math.random() * (c.height / 20)) * 20
+                    };
+                } else {
+                    snakeGame.snake.pop();
+                }
+                
+                ctx.clearRect(0, 0, c.width, c.height);
+                snakeGame.snake.forEach((s, i) => {
+                    ctx.fillStyle = `hsl(${i * 10}, 100%, 50%)`;
+                    ctx.fillRect(s.x, s.y, 20, 20);
+                });
+                ctx.fillStyle = '#ff0066';
+                ctx.fillRect(snakeGame.food.x, snakeGame.food.y, 20, 20);
+                
+                setTimeout(gameLoop, 100);
+            }
+            gameLoop();
+        }
+        
+        function restartSnake() { initSnake(); }
+
+        // FLAPPY BIRD
+        let flappyGame = { running: false, bird: {}, pipes: [], score: 0 };
+        
+        function flappyFlap() {
+            flappyGame.bird.velocity = -8;
+        }
+
+        function initFlappy() {
+            const c = document.getElementById('flappyCanvas');
+            c.width = Math.min(400, window.innerWidth - 40);
+            c.height = Math.min(600, window.innerHeight - 250);
+            const ctx = c.getContext('2d');
+            
+            flappyGame = {
+                running: true,
+                bird: { x: 50, y: c.height / 2, velocity: 0, radius: 15 },
+                pipes: [],
+                score: 0
+            };
+            
+            document.getElementById('flappyScore').textContent = 0;
+            
+            document.onkeydown = (e) => { if (e.keyCode === 32) flappyFlap(); };
+            c.onclick = flappyFlap;
+            
+            function gameLoop() {
+                if (!flappyGame.running) return;
+                
+                flappyGame.bird.velocity += 0.5;
+                flappyGame.bird.y += flappyGame.bird.velocity;
+                
+                if (flappyGame.pipes.length === 0 || flappyGame.pipes[flappyGame.pipes.length - 1].x < c.width - 200) {
+                    const gap = 150;
+                    const height = Math.random() * (c.height - gap - 100) + 50;
+                    flappyGame.pipes.push({ x: c.width, top: height, bottom: height + gap, width: 50, counted: false });
+                }
+                
+                ctx.clearRect(0, 0, c.width, c.height);
+                
+                ctx.fillStyle = '#ffff00';
+                ctx.beginPath();
+                ctx.arc(flappyGame.bird.x, flappyGame.bird.y, flappyGame.bird.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                for (let i = flappyGame.pipes.length - 1; i >= 0; i--) {
+                    const p = flappyGame.pipes[i];
+                    p.x -= 2;
+                    
+                    ctx.fillStyle = `hsl(${(p.x + i * 50) % 360}, 100%, 50%)`;
+                    ctx.fillRect(p.x, 0, p.width, p.top);
+                    ctx.fillRect(p.x, p.bottom, p.width, c.height - p.bottom);
+                    
+                    if (flappyGame.bird.x + flappyGame.bird.radius > p.x && 
+                        flappyGame.bird.x - flappyGame.bird.radius < p.x + p.width &&
+                        (flappyGame.bird.y - flappyGame.bird.radius < p.top || 
+                         flappyGame.bird.y + flappyGame.bird.radius > p.bottom)) {
+                        alert(`Game Over! Score: ${flappyGame.score}`);
+                        flappyGame.running = false;
+                        return;
+                    }
+                    
+                    if (!p.counted && flappyGame.bird.x > p.x + p.width) {
+                        flappyGame.score++;
+                        document.getElementById('flappyScore').textContent = flappyGame.score;
+                        p.counted = true;
+                    }
+                    
+                    if (p.x + p.width < 0) flappyGame.pipes.splice(i, 1);
+                }
+                
+                if (flappyGame.bird.y - flappyGame.bird.radius < 0 || 
+                    flappyGame.bird.y + flappyGame.bird.radius > c.height) {
+                    alert(`Game Over! Score: ${flappyGame.score}`);
+                    flappyGame.running = false;
+                    return;
+                }
+                
+                setTimeout(gameLoop, 20);
+            }
+            gameLoop();
+        }
+        
+        function restartFlappy() { initFlappy(); }
+
+        // COLOR MATCH
+        let colorGame = { cards: [], flipped: [], moves: 0, matches: 0 };
+        
+        function initColorMatch() {
+            const colors = ['🔴', '🟢', '🔵', '🟡', '🟣', '🟠', '⚫', '⚪'];
+            colorGame.cards = [...colors, ...colors].sort(() => Math.random() - 0.5);
+            colorGame.flipped = [];
+            colorGame.moves = 0;
+            colorGame.matches = 0;
+            
+            document.getElementById('colorMoves').textContent = 0;
+            document.getElementById('colorMatches').textContent = 0;
+            
+            const grid = document.getElementById('colorGrid');
+            grid.innerHTML = '';
+            
+            colorGame.cards.forEach((color, i) => {
+                const card = document.createElement('div');
+                card.className = 'color-card';
+                card.textContent = '?';
+                card.dataset.index = i;
+                card.dataset.color = color;
+                card.onclick = () => {
+                    if (colorGame.flipped.length >= 2 || card.textContent !== '?') return;
+                    
+                    card.textContent = color;
+                    colorGame.flipped.push(card);
+                    
+                    if (colorGame.flipped.length === 2) {
+                        colorGame.moves++;
+                        document.getElementById('colorMoves').textContent = colorGame.moves;
+                        
+                        setTimeout(() => {
+                            if (colorGame.flipped[0].dataset.color === colorGame.flipped[1].dataset.color) {
+                                colorGame.matches++;
+                                document.getElementById('colorMatches').textContent = colorGame.matches;
+                                if (colorGame.matches === 8) alert(`You won in ${colorGame.moves} moves!`);
+                            } else {
+                                colorGame.flipped.forEach(c => c.textContent = '?');
+                            }
+                            colorGame.flipped = [];
+                        }, 1000);
+                    }
+                };
+                grid.appendChild(card);
+            });
+        }
+        
+        function restartColorMatch() { initColorMatch(); }
+
+        // BREAKOUT
+        let breakoutGame = { running: false, paddle: {}, ball: {}, bricks: [], score: 0, lives: 3 };
+        
+        function initBreakout() {
+            const c = document.getElementById('breakoutCanvas');
+            c.width = Math.min(600, window.innerWidth - 40);
+            c.height = Math.min(400, window.innerHeight - 300);
+            const ctx = c.getContext('2d');
+            
+            breakoutGame = {
+                running: true,
+                paddle: { x: c.width / 2 - 50, y: c.height - 30, width: 100, height: 10, dx: 0 },
+                ball: { x: c.width / 2, y: c.height - 50, radius: 8, dx: 3, dy: -3 },
+                bricks: [],
+                score: 0,
+                lives: 3
+            };
+            
+            for (let r = 0; r < 5; r++) {
+                for (let col = 0; col < 8; col++) {
+                    breakoutGame.bricks.push({
+                        x: col * 75,
+                        y: r * 30 + 30,
+                        width: 70,
+                        height: 25,
+                        alive: true,
+                        color: `hsl(${(r * 8 + col) * 20}, 100%, 50%)`
+                    });
+                }
+            }
+            
+            document.getElementById('breakoutScore').textContent = 0;
+            document.getElementById('breakoutLives').textContent = 3;
+            
+            let keys = {};
+            document.onkeydown = e => keys[e.keyCode] = true;
+            document.onkeyup = e => keys[e.keyCode] = false;
+            c.onmousemove = e => {
+                const rect = c.getBoundingClientRect();
+                breakoutGame.paddle.x = e.clientX - rect.left - breakoutGame.paddle.width / 2;
+            };
+            
+            function gameLoop() {
+                if (!breakoutGame.running) return;
+                
+                if (keys[37]) breakoutGame.paddle.x -= 7;
+                if (keys[39]) breakoutGame.paddle.x += 7;
+                
+                if (breakoutGame.paddle.x < 0) breakoutGame.paddle.x = 0;
+                if (breakoutGame.paddle.x > c.width - breakoutGame.paddle.width) {
+                    breakoutGame.paddle.x = c.width - breakoutGame.paddle.width;
+                }
+                
+                breakoutGame.ball.x += breakoutGame.ball.dx;
+                breakoutGame.ball.y += breakoutGame.ball.dy;
+                
+                if (breakoutGame.ball.x + breakoutGame.ball.radius > c.width || 
+                    breakoutGame.ball.x - breakoutGame.ball.radius < 0) {
+                    breakoutGame.ball.dx = -breakoutGame.ball.dx;
+                }
+                if (breakoutGame.ball.y - breakoutGame.ball.radius < 0) {
+                    breakoutGame.ball.dy = -breakoutGame.ball.dy;
+                }
+                
+                if (breakoutGame.ball.y + breakoutGame.ball.radius > breakoutGame.paddle.y &&
+                    breakoutGame.ball.x > breakoutGame.paddle.x && 
+                    breakoutGame.ball.x < breakoutGame.paddle.x + breakoutGame.paddle.width) {
+                    breakoutGame.ball.dy = -breakoutGame.ball.dy;
+                }
+                
+                if (breakoutGame.ball.y + breakoutGame.ball.radius > c.height) {
+                    breakoutGame.lives--;
+                    document.getElementById('breakoutLives').textContent = breakoutGame.lives;
+                    if (breakoutGame.lives === 0) {
+                        alert(`Game Over! Score: ${breakoutGame.score}`);
+                        breakoutGame.running = false;
+                        return;
+                    }
+                    breakoutGame.ball.x = c.width / 2;
+                    breakoutGame.ball.y = c.height - 50;
+                }
+                
+                ctx.clearRect(0, 0, c.width, c.height);
+                
+                ctx.fillStyle = '#00ffff';
+                ctx.fillRect(breakoutGame.paddle.x, breakoutGame.paddle.y, 
+                           breakoutGame.paddle.width, breakoutGame.paddle.height);
+                
+                ctx.fillStyle = '#fff';
+                ctx.beginPath();
+                ctx.arc(breakoutGame.ball.x, breakoutGame.ball.y, breakoutGame.ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                let allDead = true;
+                breakoutGame.bricks.forEach(b => {
+                    if (b.alive) {
+                        allDead = false;
+                        ctx.fillStyle = b.color;
+                        ctx.fillRect(b.x, b.y, b.width, b.height);
+                        
+                        if (breakoutGame.ball.x > b.x && breakoutGame.ball.x < b.x + b.width &&
+                            breakoutGame.ball.y > b.y && breakoutGame.ball.y < b.y + b.height) {
+                            breakoutGame.ball.dy = -breakoutGame.ball.dy;
+                            b.alive = false;
+                            breakoutGame.score += 10;
+                            document.getElementById('breakoutScore').textContent = breakoutGame.score;
+                        }
+                    }
+                });
+                
+                if (allDead) {
+                    alert(`You Win! Score: ${breakoutGame.score}`);
+                    breakoutGame.running = false;
+                    return;
+                }
+                
+                setTimeout(gameLoop, 20);
+            }
+            gameLoop();
+        }
+        
+        function restartBreakout() { initBreakout(); }
+
+        // PONG
+        let pongGame = { running: false, p1: {}, p2: {}, ball: {}, scoreP1: 0, scoreP2: 0 };
+        
+        function pongMove(dir) {
+            pongGame.p1.dy = dir === 'up' ? -6 : 6;
+            setTimeout(() => pongGame.p1.dy = 0, 100);
+        }
+
+        function initPong() {
+            const c = document.getElementById('pongCanvas');
+            c.width = Math.min(600, window.innerWidth - 40);
+            c.height = Math.min(400, window.innerHeight - 300);
+            const ctx = c.getContext('2d');
+            
+            pongGame = {
+                running: true,
+                p1: { x: 10, y: c.height / 2 - 40, width: 10, height: 80, dy: 0 },
+                p2: { x: c.width - 20, y: c.height / 2 - 40, width: 10, height: 80 },
+                ball: { x: c.width / 2, y: c.height / 2, radius: 8, dx: 4, dy: 4 },
+                scoreP1: 0,
+                scoreP2: 0
+            };
+            
+            document.getElementById('pongScoreP1').textContent = 0;
+            document.getElementById('pongScoreP2').textContent = 0;
+            
+            document.onkeydown = e => {
+                if (e.keyCode === 38 || e.keyCode === 87) pongGame.p1.dy = -6;
+                if (e.keyCode === 40 || e.keyCode === 83) pongGame.p1.dy = 6;
+            };
+            document.onkeyup = () => pongGame.p1.dy = 0;
+            
+            function gameLoop() {
+                if (!pongGame.running) return;
+                
+                pongGame.p1.y += pongGame.p1.dy;
+                if (pongGame.p1.y < 0) pongGame.p1.y = 0;
+                if (pongGame.p1.y > c.height - pongGame.p1.height) {
+                    pongGame.p1.y = c.height - pongGame.p1.height;
+                }
+                
+                if (pongGame.p2.y + pongGame.p2.height / 2 < pongGame.ball.y) pongGame.p2.y += 4;
+                else pongGame.p2.y -= 4;
+                
+                pongGame.ball.x += pongGame.ball.dx;
+                pongGame.ball.y += pongGame.ball.dy;
+                
+                if (pongGame.ball.y - pongGame.ball.radius < 0 || 
+                    pongGame.ball.y + pongGame.ball.radius > c.height) {
+                    pongGame.ball.dy = -pongGame.ball.dy;
+                }
+                
+                if (pongGame.ball.x - pongGame.ball.radius < pongGame.p1.x + pongGame.p1.width &&
+                    pongGame.ball.y > pongGame.p1.y && 
+                    pongGame.ball.y < pongGame.p1.y + pongGame.p1.height) {
+                    pongGame.ball.dx = -pongGame.ball.dx;
+                }
+                
+                if (pongGame.ball.x + pongGame.ball.radius > pongGame.p2.x &&
+                    pongGame.ball.y > pongGame.p2.y && 
+                    pongGame.ball.y < pongGame.p2.y + pongGame.p2.height) {
+                    pongGame.ball.dx = -pongGame.ball.dx;
+                }
+                
+                if (pongGame.ball.x < 0) {
+                    pongGame.scoreP2++;
+                    document.getElementById('pongScoreP2').textContent = pongGame.scoreP2;
+                    pongGame.ball.x = c.width / 2;
+                    pongGame.ball.y = c.height / 2;
+                }
+                if (pongGame.ball.x > c.width) {
+                    pongGame.scoreP1++;
+                    document.getElementById('pongScoreP1').textContent = pongGame.scoreP1;
+                    pongGame.ball.x = c.width / 2;
+                    pongGame.ball.y = c.height / 2;
+                }
+                
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, c.width, c.height);
+                
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(pongGame.p1.x, pongGame.p1.y, pongGame.p1.width, pongGame.p1.height);
+                ctx.fillRect(pongGame.p2.x, pongGame.p2.y, pongGame.p2.width, pongGame.p2.height);
+                
+                ctx.beginPath();
+                ctx.arc(pongGame.ball.x, pongGame.ball.y, pongGame.ball.radius, 0, Math.PI * 2);
+                ctx.fill();
+                
+                setTimeout(gameLoop, 20);
+            }
+            gameLoop();
+        }
+        
+        function restartPong() { initPong(); }
+
+        // SHOOTER
+        let shooterGame = { running: false, player: {}, enemies: [], bullets: [], score: 0, lives: 3 };
+        
+        function shooterMove(dir) {
+            shooterGame.player.dx = dir === 'left' ? -5 : 5;
+            setTimeout(() => shooterGame.player.dx = 0, 100);
+        }
+        
+        function shooterShoot() {
+            shooterGame.bullets.push({
+                x: shooterGame.player.x + shooterGame.player.width / 2,
+                y: shooterGame.player.y,
+                width: 4,
+                height: 10,
+                dy: -7
+            });
+        }
+
+        function initShooter() {
+            const c = document.getElementById('shooterCanvas');
+            c.width = Math.min(600, window.innerWidth - 40);
+            c.height = Math.min(400, window.innerHeight - 300);
+            const ctx = c.getContext('2d');
+            
+            shooterGame = {
+                running: true,
+                player: { x: c.width / 2 - 20, y: c.height - 50, width: 40, height: 30, dx: 0 },
+                enemies: [],
+                bullets: [],
+                score: 0,
+                lives: 3
+            };
+            
+            for (let r = 0; r < 3; r++) {
+                for (let col = 0; col < 8; col++) {
+                    shooterGame.enemies.push({
+                        x: col * 70 + 20,
+                        y: r * 50 + 30,
+                        width: 40,
+                        height: 30,
+                        alive: true
+                    });
+                }
+            }
+            
+            document.getElementById('shooterScore').textContent = 0;
+            document.getElementById('shooterLives').textContent = 3;
+            
+            document.onkeydown = e => {
+                if (e.keyCode === 37) shooterGame.player.dx = -5;
+                if (e.keyCode === 39) shooterGame.player.dx = 5;
+                if (e.keyCode === 32) { e.preventDefault(); shooterShoot(); }
+            };
+            document.onkeyup = () => shooterGame.player.dx = 0;
+            
+            function gameLoop() {
+                if (!shooterGame.running) return;
+                
+                shooterGame.player.x += shooterGame.player.dx;
+                if (shooterGame.player.x < 0) shooterGame.player.x = 0;
+                if (shooterGame.player.x > c.width - shooterGame.player.width) {
+                    shooterGame.player.x = c.width - shooterGame.player.width;
+                }
+                
+                ctx.clearRect(0, 0, c.width, c.height);
+                
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(shooterGame.player.x, shooterGame.player.y, 
+                           shooterGame.player.width, shooterGame.player.height);
+                
+                for (let i = shooterGame.bullets.length - 1; i >= 0; i--) {
+                    const b = shooterGame.bullets[i];
+                    b.y += b.dy;
+                    
+                    ctx.fillStyle = '#ffff00';
+                    ctx.fillRect(b.x, b.y, b.width, b.height);
+                    
+                    if (b.y < 0) shooterGame.bullets.splice(i, 1);
+                }
+                
+                let allDead = true;
+                shooterGame.enemies.forEach((e, idx) => {
+                    if (e.alive) {
+                        allDead = false;
+                        
+                        ctx.fillStyle = '#ff00ff';
+                        ctx.fillRect(e.x, e.y, e.width, e.height);
+                        
+                        for (let i = shooterGame.bullets.length - 1; i >= 0; i--) {
+                            const b = shooterGame.bullets[i];
+                            if (b.x > e.x && b.x < e.x + e.width &&
+                                b.y > e.y && b.y < e.y + e.height) {
+                                e.alive = false;
+                                shooterGame.bullets.splice(i, 1);
+                                shooterGame.score += 10;
+                                document.getElementById('shooterScore').textContent = shooterGame.score;
+                            }
+                        }
+                        
+                        e.y += 0.3;
+                        
+                        if (e.y + e.height > shooterGame.player.y) {
+                            alert(`Game Over! Score: ${shooterGame.score}`);
+                            shooterGame.running = false;
+                            return;
+                        }
+                    }
+                });
+                
+                if (allDead) {
+                    alert(`You Win! Score: ${shooterGame.score}`);
+                    shooterGame.running = false;
+                    return;
+                }
+                
+                setTimeout(gameLoop, 20);
+            }
+            gameLoop();
+        }
+        
+        function restartShooter() { initShooter(); }
+
+        // RACING
+        let racingGame = { running: false, car: {}, obstacles: [], score: 0 };
+        
+        function racingMove(dir) {
+            racingGame.car.dx = dir === 'left' ? -5 : 5;
+            setTimeout(() => racingGame.car.dx = 0, 100);
+        }
+
+        function initRacing() {
+            const c = document.getElementById('racingCanvas');
+            c.width = Math.min(400, window.innerWidth - 40);
+            c.height = Math.min(600, window.innerHeight - 250);
+            const ctx = c.getContext('2d');
+            
+            racingGame = {
+                running: true,
+                car: { x: c.width / 2 - 20, y: c.height - 80, width: 40, height: 60, dx: 0 },
+                obstacles: [],
+                score: 0
+            };
+            
+            document.getElementById('racingScore').textContent = 0;
+            
+            document.onkeydown = e => {
+                if (e.keyCode === 37) racingGame.car.dx = -5;
+                if (e.keyCode === 39) racingGame.car.dx = 5;
+            };
+            document.onkeyup = () => racingGame.car.dx = 0;
+            
+            function gameLoop() {
+                if (!racingGame.running) return;
+                
+                racingGame.car.x += racingGame.car.dx;
+                if (racingGame.car.x < 0) racingGame.car.x = 0;
+                if (racingGame.car.x > c.width - racingGame.car.width) {
+                    racingGame.car.x = c.width - racingGame.car.width;
+                }
+                
+                if (Math.random() < 0.02) {
+                    racingGame.obstacles.push({
+                        x: Math.random() * (c.width - 40),
+                        y: -40,
+                        width: 40,
+                        height: 60
+                    });
+                }
+                
+                ctx.fillStyle = '#333';
+                ctx.fillRect(0, 0, c.width, c.height);
+                
+                ctx.strokeStyle = '#fff';
+                ctx.setLineDash([20, 20]);
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(c.width / 2, 0);
+                ctx.lineTo(c.width / 2, c.height);
+                ctx.stroke();
+                ctx.setLineDash([]);
+                
+                ctx.fillStyle = '#00ff00';
+                ctx.fillRect(racingGame.car.x, racingGame.car.y, 
+                           racingGame.car.width, racingGame.car.height);
+                
+                for (let i = racingGame.obstacles.length - 1; i >= 0; i--) {
+                    const o = racingGame.obstacles[i];
+                    o.y += 5;
+                    
+                    ctx.fillStyle = '#ff0000';
+                    ctx.fillRect(o.x, o.y, o.width, o.height);
+                    
+                    if (racingGame.car.x < o.x + o.width &&
+                        racingGame.car.x + racingGame.car.width > o.x &&
+                        racingGame.car.y < o.y + o.height &&
+                        racingGame.car.y + racingGame.car.height > o.y) {
+                        alert(`Game Over! Distance: ${racingGame.score}m`);
+                        racingGame.running = false;
+                        return;
+                    }
+                    
+                    if (o.y > c.height) {
+                        racingGame.obstacles.splice(i, 1);
+                        racingGame.score += 10;
+                        document.getElementById('racingScore').textContent = racingGame.score;
+                    }
+                }
+                
+                setTimeout(gameLoop, 30);
+            }
+            gameLoop();
+        }
+        
+        function restartRacing() { initRacing(); }
+
+        // TIC TAC TOE
+        let tttGame = { board: [], current: 'X', over: false };
+        
+        function initTicTacToe() {
+            tttGame = { board: Array(9).fill(''), current: 'X', over: false };
+            document.getElementById('tttStatus').textContent = "Player X's Turn";
+            
+            const board = document.getElementById('tttBoard');
+            board.innerHTML = '';
+            
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.style.cssText = 'width:100px;height:100px;background:rgba(255,255,255,0.1);border:3px solid rgba(255,255,255,0.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:3rem;font-weight:bold;cursor:pointer;';
+                cell.onclick = () => {
+                    if (tttGame.board[i] || tttGame.over) return;
+                    
+                    tttGame.board[i] = tttGame.current;
+                    cell.textContent = tttGame.current;
+                    cell.style.color = tttGame.current === 'X' ? '#00ffff' : '#ff00ff';
+                    
+                    const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+                    const win = wins.some(combo => combo.every(i => tttGame.board[i] === tttGame.current));
+                    
+                    if (win) {
+                        document.getElementById('tttStatus').textContent = `Player ${tttGame.current} Wins! 🎉`;
+                        tttGame.over = true;
+                        return;
+                    }
+                    
+                    if (tttGame.board.every(c => c !== '')) {
+                        document.getElementById('tttStatus').textContent = "Draw!";
+                        tttGame.over = true;
+                        return;
+                    }
+                    
+                    tttGame.current = tttGame.current === 'X' ? 'O' : 'X';
+                    document.getElementById('tttStatus').textContent = `Player ${tttGame.current}'s Turn`;
+                };
+                board.appendChild(cell);
+            }
+        }
+        
+        function restartTicTacToe() { initTicTacToe(); }
+
+        // PLATFORMER
+        let platformerGame = { running: false, player: {}, platforms: [], coins: [], score: 0 };
+        
+        function platformerMove(dir) {
+            platformerGame.player.dx = dir === 'left' ? -5 : 5;
+            setTimeout(() => platformerGame.player.dx = 0, 100);
+        }
+        
+        function platformerJump() {
+            if (platformerGame.player.grounded) {
+                platformerGame.player.dy = -12;
+            }
+        }
+
+        function initPlatformer() {
+            const c = document.getElementById('platformerCanvas');
+            c.width = Math.min(600, window.innerWidth - 40);
+            c.height = Math.min(400, window.innerHeight - 300);
+            const ctx = c.getContext('2d');
+            
+            platformerGame = {
+                running: true,
+                player: { x: 50, y: 100, width: 30, height: 40, dx: 0, dy: 0, grounded: false },
+                platforms: [
+                    { x: 0, y: c.height - 20, width: c.width, height: 20 },
+                    { x: 100, y: 300, width: 150, height: 20 },
+                    { x: 300, y: 200, width: 150, height: 20 }
+                ],
+                coins: [
+                    { x: 150, y: 260, collected: false },
+                    { x: 350, y: 160, collected: false }
+                ],
+                score: 0
+            };
+            
+            document.getElementById('platformerScore').textContent = 0;
+            
+            document.onkeydown = e => {
+                if (e.keyCode === 37) platformerGame.player.dx = -5;
+                if (e.keyCode === 39) platformerGame.player.dx = 5;
+                if (e.keyCode === 32) { e.preventDefault(); platformerJump(); }
+            };
+            document.onkeyup = () => platformerGame.player.dx = 0;
+            
+            function gameLoop() {
+                if (!platformerGame.running) return;
+                
+                platformerGame.player.dy += 0.5;
+                platformerGame.player.x += platformerGame.player.dx;
+                platformerGame.player.y += platformerGame.player.dy;
+                
+                if (platformerGame.player.x < 0) platformerGame.player.x = 0;
+                if (platformerGame.player.x > c.width - platformerGame.player.width) {
+                    platformerGame.player.x = c.width - platformerGame.player.width;
+                }
+                
+                platformerGame.player.grounded = false;
+                platformerGame.platforms.forEach(p => {
+                    if (platformerGame.player.x < p.x + p.width &&
+                        platformerGame.player.x + platformerGame.player.width > p.x &&
+                        platformerGame.player.y + platformerGame.player.height > p.y &&
+                        platformerGame.player.y + platformerGame.player.height < p.y + p.height) {
+                        platformerGame.player.y = p.y - platformerGame.player.height;
+                        platformerGame.player.dy = 0;
+                        platformerGame.player.grounded = true;
+                    }
+                });
+                
+                ctx.fillStyle = '#87CEEB';
+                ctx.fillRect(0, 0, c.width, c.height);
+                
+                ctx.fillStyle = '#8B4513';
+                platformerGame.platforms.forEach(p => ctx.fillRect(p.x, p.y, p.width, p.height));
+                
+                platformerGame.coins.forEach(coin => {
+                    if (!coin.collected) {
+                        ctx.fillStyle = '#FFD700';
+                        ctx.beginPath();
+                        ctx.arc(coin.x, coin.y, 15, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        if (Math.abs(platformerGame.player.x + platformerGame.player.width / 2 - coin.x) < 25 &&
+                            Math.abs(platformerGame.player.y + platformerGame.player.height / 2 - coin.y) < 30) {
+                            coin.collected = true;
+                            platformerGame.score += 10;
+                            document.getElementById('platformerScore').textContent = platformerGame.score;
+                        }
+                    }
+                });
+                
+                ctx.fillStyle = '#ff0066';
+                ctx.fillRect(platformerGame.player.x, platformerGame.player.y, 
+                           platformerGame.player.width, platformerGame.player.height);
+                
+                setTimeout(gameLoop, 20);
+            }
+            gameLoop();
+        }
+        
+        function restartPlatformer() { initPlatformer(); }
+
+        // MAZE
+        let mazeGame = { running: false, maze: [], player: {}, time: 0, startTime: 0 };
+        
+        function mazeMove(dir) {
+            const newPos = { ...mazeGame.player };
+            
+            if (dir === 'up') newPos.y--;
+            if (dir === 'down') newPos.y++;
+            if (dir === 'left') newPos.x--;
+            if (dir === 'right') newPos.x++;
+            
+            const size = mazeGame.maze.length;
+            if (newPos.x >= 0 && newPos.x < size && newPos.y >= 0 && newPos.y < size &&
+                mazeGame.maze[newPos.y][newPos.x] !== 1) {
+                mazeGame.player = newPos;
+                
+                if (mazeGame.maze[newPos.y][newPos.x] === 2) {
+                    const time = Math.floor((Date.now() - mazeGame.startTime) / 1000);
+                    alert(`You escaped in ${time} seconds!`);
+                    mazeGame.running = false;
+                }
+            }
+        }
+
+        function initMaze() {
+            const c = document.getElementById('mazeCanvas');
+            c.width = Math.min(500, window.innerWidth - 40);
+            c.height = Math.min(500, window.innerWidth - 40);
+            const ctx = c.getContext('2d');
+            
+            const size = 10;
+            const maze = Array(size).fill().map(() => Array(size).fill(0));
+            
+            for (let i = 0; i < size; i++) {
+                for (let j = 0; j < size; j++) {
+                    if (Math.random() > 0.7) maze[i][j] = 1;
+                }
+            }
+            
+            maze[0][0] = 0;
+            maze[size-1][size-1] = 2;
+            
+            mazeGame = {
+                running: true,
+                maze: maze,
+                player: { x: 0, y: 0 },
+                time: 0,
+                startTime: Date.now()
+            };
+            
+            document.onkeydown = e => {
+                if (e.keyCode === 37 || e.keyCode === 65) mazeMove('left');
+                if (e.keyCode === 38 || e.keyCode === 87) mazeMove('up');
+                if (e.keyCode === 39 || e.keyCode === 68) mazeMove('right');
+                if (e.keyCode === 40 || e.keyCode === 83) mazeMove('down');
+            };
+            
+            function gameLoop() {
+                if (!mazeGame.running) return;
+                
+                const cellSize = c.width / size;
+                
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, c.width, c.height);
+                
+                for (let i = 0; i < size; i++) {
+                    for (let j = 0; j < size; j++) {
+                        if (mazeGame.maze[i][j] === 1) {
+                            ctx.fillStyle = '#444';
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        } else if (mazeGame.maze[i][j] === 2) {
+                            ctx.fillStyle = '#00ff00';
+                            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+                        }
+                    }
+                }
+                
+                ctx.fillStyle = '#ffff00';
+                ctx.beginPath();
+                ctx.arc(
+                    mazeGame.player.x * cellSize + cellSize / 2,
+                    mazeGame.player.y * cellSize + cellSize / 2,
+                    cellSize / 3,
+                    0,
+                    Math.PI * 2
+                );
+                ctx.fill();
+                
+                const time = Math.floor((Date.now() - mazeGame.startTime) / 1000);
+                document.getElementById('mazeTime').textContent = time;
+                
+                setTimeout(gameLoop, 50);
+            }
+            gameLoop();
+        }
+        
+        function restartMaze() { initMaze(); }
+    </script>
+</body>
+</html>
