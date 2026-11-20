@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Beta tutorial · TomasekPlays</title>
+  <style>
+    :root { --accent:#5eead4; --muted:rgba(244,244,240,.6); }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { background:#000; color:#f4f4f0; min-height:100vh; display:grid; place-items:center; font-family:Segoe UI,system-ui,sans-serif; }
+    .stage { width:min(960px,100vw); aspect-ratio:16/9; position:relative; overflow:hidden; border-radius:12px; border:1px solid rgba(255,255,255,.08); background:#09090b; }
+    .slide { position:absolute; inset:0; opacity:0; transition:opacity .55s ease; background:#09090b center/contain no-repeat; }
+    .slide.on { opacity:1; }
+    .cap { position:absolute; left:0; right:0; bottom:48px; z-index:2; padding:.85rem 1.1rem; background:rgba(0,0,0,.55); color:var(--accent); font-size:.95rem; }
+    .bar { position:absolute; left:0; right:0; bottom:0; z-index:3; display:flex; gap:.55rem; align-items:center; padding:.65rem .9rem; background:rgba(0,0,0,.65); }
+    button { border:0; border-radius:999px; padding:.5rem .95rem; font-weight:700; cursor:pointer; }
+    .play { background:var(--accent); color:#04120f; }
+    .prog { flex:1; height:4px; background:rgba(255,255,255,.12); border-radius:99px; overflow:hidden; }
+    .prog i { display:block; height:100%; width:0; background:var(--accent); }
+    audio { display:none; }
+  </style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="slide on" style="background-image:url('assets/real-home.png')" data-c="Step 1 — Open TomasekPlays web"></div>
+    <div class="slide" style="background-image:url('assets/real-beta.png')" data-c="Step 2 — Press Try Beta mode"></div>
+    <div class="slide" style="background-image:url('assets/real-codes.png')" data-c="Step 3 — Beta code: 148"></div>
+    <div class="slide" style="background-image:url('assets/real-code.png')" data-c="Step 4 — Type 148 · press Enter"></div>
+    <div class="slide" style="background-image:url('assets/real-device.png')" data-c="Step 5 — Choose PC or Mobile"></div>
+    <div class="slide" style="background-image:url('assets/real-arcade.png')" data-c="Step 6 — Pick a game and play"></div>
+    <div class="cap" id="cap">Step 1 — Open TomasekPlays web</div>
+    <div class="bar">
+      <button class="play" id="btn" type="button">Play tutorial</button>
+      <div class="prog"><i id="prog"></i></div>
+    </div>
+  </div>
+  <audio id="bg" src="music/tutorial.mp3" loop></audio>
+  <script>
+    const slides=[...document.querySelectorAll('.slide')]; const dur=4500; let i=0,t0=0,playing=false;
+    const bg=document.getElementById('bg');
+    function show(n){ slides.forEach((s,k)=>s.classList.toggle('on',k===n)); document.getElementById('cap').textContent=slides[n].dataset.c; i=n; t0=performance.now(); }
+    function tick(now){ if(!playing)return; const p=Math.min(1,(now-t0)/dur); document.getElementById('prog').style.width=((i+p)/slides.length*100)+'%'; if(p>=1){ if(i<slides.length-1) show(i+1); else { playing=false; bg.pause(); document.getElementById('btn').textContent='Replay'; return; } } requestAnimationFrame(tick); }
+    document.getElementById('btn').onclick=async()=>{ playing=true; document.getElementById('btn').textContent='Playing…'; bg.currentTime=5; bg.volume=.55; await bg.play(); show(0); requestAnimationFrame(tick); };
+  </script>
+</body>
+</html>

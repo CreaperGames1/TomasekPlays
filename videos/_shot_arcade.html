@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta id="viewportMeta" name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arcade · Tomasek Plays</title>
+  <link rel="icon" href="../logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #09090b;
+      --elev: #111114;
+      --ink: #f4f4f0;
+      --muted: rgba(244, 244, 240, 0.55);
+      --line: rgba(244, 244, 240, 0.12);
+      --accent: #5eead4;
+      --accent-dim: rgba(94, 234, 212, 0.14);
+      --font: "Space Grotesk", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+      touch-action: manipulation;
+    }
+    button, input, select { font: inherit; color: inherit; }
+    a { color: inherit; text-decoration: none; }
+
+    .bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 80% 50% at 70% 10%, rgba(94,234,212,.1), transparent 55%),
+        radial-gradient(ellipse 50% 40% at 10% 90%, rgba(232,213,183,.06), transparent 50%),
+        #09090b;
+    }
+
+    .screen { display: none; position: relative; z-index: 2; min-height: 100%; }
+    .screen.on { display: block; }
+    #player.on { display: flex; flex-direction: column; min-height: 100%; }
+
+    .wrap { width: min(1100px, calc(100% - 2rem)); margin: 0 auto; }
+    .gate { min-height: 100vh; display: grid; place-items: center; padding: 1.25rem; }
+
+    .card {
+      width: min(420px, 100%);
+      padding: 1.6rem;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(160deg, rgba(94,234,212,.08), transparent 45%), var(--elev);
+      box-shadow: 0 24px 60px rgba(0,0,0,.45);
+    }
+    .card h1 { font-size: 1.4rem; letter-spacing: -.03em; margin: .2rem 0 .4rem; }
+    .card p { color: var(--muted); font-size: .92rem; line-height: 1.5; margin-bottom: 1rem; }
+    .brand-row { display: flex; gap: .75rem; align-items: center; margin-bottom: .75rem; }
+    .brand-row img { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--line); }
+
+    label.f { display: grid; gap: .35rem; margin-bottom: .8rem; font-family: var(--mono); font-size: .68rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    input, select {
+      width: 100%; padding: .75rem .85rem; border-radius: 10px; border: 1px solid var(--line);
+      background: rgba(0,0,0,.35); outline: none;
+    }
+    input:focus, select:focus { border-color: rgba(94,234,212,.5); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .err { color: #f87171; min-height: 1.1rem; font-size: .85rem; margin-bottom: .5rem; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
+      border: none; cursor: pointer; border-radius: 999px; padding: .8rem 1.1rem; font-weight: 700;
+    }
+    .btn-a { background: var(--accent); color: #04120f; width: 100%; }
+    .btn-g { background: transparent; border: 1px solid var(--line); color: var(--muted); }
+    .btn-g:hover { color: var(--ink); }
+    .btn:active { transform: scale(.98); }
+
+    .devs { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; margin-bottom: 1rem; }
+    .dev {
+      padding: 1rem .7rem; border-radius: 14px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.02); cursor: pointer; text-align: center;
+    }
+    .dev strong { display: block; margin-bottom: .2rem; }
+    .dev span { color: var(--muted); font-size: .75rem; }
+    .dev.on { border-color: rgba(94,234,212,.55); background: var(--accent-dim); }
+
+    .nav { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: 1rem 0; flex-wrap: wrap; }
+    .brand { display: inline-flex; align-items: center; gap: .65rem; font-weight: 600; }
+    .brand img { width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--line); display: block; transition: transform .2s ease, box-shadow .2s ease; }
+    .brand .yt-logo:hover img { transform: scale(1.06); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .nav-r { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+    .chip { font-family: var(--mono); font-size: .68rem; letter-spacing: .05em; text-transform: uppercase; padding: .4rem .65rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+    .chip b { color: var(--accent); font-weight: 500; }
+    .ico { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: rgba(255,255,255,.03); cursor: pointer; }
+
+    .head { margin: .25rem 0 1.25rem; }
+    .head h2 { font-size: clamp(1.5rem, 4vw, 2.1rem); letter-spacing: -.04em; }
+    .head p { color: var(--muted); margin-top: .35rem; max-width: 34rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .8rem; padding-bottom: 2.5rem; }
+    .gcard {
+      text-align: left; padding: 1rem; min-height: 145px; border-radius: 14px; border: 1px solid var(--line);
+      background: var(--elev); cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .gcard:hover { border-color: rgba(94,234,212,.4); transform: translateY(-2px); }
+    .gcard .e { font-size: 1.5rem; margin-bottom: .4rem; }
+    .gcard h3 { font-size: .98rem; letter-spacing: -.02em; }
+    .gcard p { color: var(--muted); font-size: .76rem; margin-top: .2rem; line-height: 1.35; }
+    .gcard .m { margin-top: .7rem; font-family: var(--mono); font-size: .62rem; color: var(--accent); text-transform: uppercase; letter-spacing: .04em; }
+
+    .pbar {
+      display: flex; justify-content: space-between; gap: .75rem; flex-wrap: wrap; align-items: center;
+      padding: .75rem 1rem; border-bottom: 1px solid var(--line); background: rgba(9,9,11,.9);
+      position: sticky; top: 0; z-index: 5;
+    }
+    .pill { font-family: var(--mono); font-size: .78rem; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: .35rem .65rem; }
+    .pill b { color: var(--accent); font-weight: 500; }
+
+    .stage {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 1rem; gap: .75rem; width: 100%;
+    }
+    .canvas-wrap {
+      width: min(100%, 420px);
+      background: #0b0d12;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    }
+    #cv {
+      display: block;
+      width: 100%;
+      height: auto;
+      vertical-align: top;
+      touch-action: none;
+      background: #0b0d12;
+    }
+    #dom {
+      display: none;
+      width: min(100%, 420px);
+      min-height: 380px;
+      padding: 1rem;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: #0b0d12;
+    }
+    .hint { color: var(--muted); font-size: .82rem; text-align: center; max-width: 26rem; }
+
+    .pad { display: none; width: min(100%, 420px); gap: .5rem; }
+    body.is-mobile .pad { display: grid; }
+    .pad.one { grid-template-columns: 1fr; }
+    .pad.dir { grid-template-columns: repeat(3, 1fr); grid-template-rows: 54px 54px; }
+    .pad button {
+      border: 1px solid var(--line); background: rgba(255,255,255,.05); border-radius: 12px;
+      font-size: 1.1rem; font-weight: 700; cursor: pointer; min-height: 54px;
+    }
+    .pad.dir .u { grid-column: 2; }
+    .pad.dir .l { grid-column: 1; grid-row: 2; }
+    .pad.dir .a { grid-column: 2; grid-row: 2; }
+    .pad.dir .r { grid-column: 3; grid-row: 2; }
+
+    .overlay {
+      position: fixed; inset: 0; z-index: 40; display: none; place-items: center;
+      padding: 1rem; background: rgba(5,5,8,.75); backdrop-filter: blur(8px);
+    }
+    .overlay.on { display: grid; }
+    .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; padding: .7rem 0; border-bottom: 1px solid var(--line); }
+    .row small { display: block; color: var(--muted); font-size: .75rem; }
+    .tog { width: 46px; height: 26px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,.08); position: relative; cursor: pointer; }
+    .tog.on { background: var(--accent); border-color: transparent; }
+    .tog::after { content: ""; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: .15s; }
+    .tog.on::after { transform: translateX(20px); background: #04120f; }
+
+    .mem { display: grid; grid-template-columns: repeat(4, 1fr); gap: .45rem; }
+    .mem button { aspect-ratio: 1; border-radius: 10px; border: 1px solid var(--line); background: #151820; font-size: 1.3rem; cursor: pointer; }
+    .ttt { display: grid; grid-template-columns: repeat(3, 1fr); gap: .45rem; max-width: 300px; margin: 1rem auto; }
+    .ttt button { aspect-ratio: 1; border-radius: 12px; border: 1px solid var(--line); background: #151820; font-size: 2rem; font-weight: 700; color: var(--accent); cursor: pointer; }
+    .g2048 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 6px; background: #0f1218; border-radius: 12px; max-width: 340px; margin: 0 auto; }
+    .g2048 div { aspect-ratio: 1; border-radius: 8px; display: grid; place-items: center; font-weight: 700; font-size: 1.25rem; background: #1a1f2a; }
+
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .btn-home {
+      display: inline-flex; align-items: center; gap: .35rem;
+      padding: .5rem .9rem; font-size: .82rem; border-radius: 999px;
+      border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer;
+    }
+    .btn-home:hover { color: var(--ink); border-color: rgba(244,244,240,.25); }
+
+    .fx {
+      position: fixed; inset: 0; z-index: 200; pointer-events: none;
+      opacity: 0; visibility: hidden;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(94,234,212,.28), transparent 55%),
+        rgba(9,9,11,.7);
+    }
+    .fx.go {
+      visibility: visible;
+      animation: fxFlash .75s ease forwards;
+    }
+    .fx.play {
+      background:
+        radial-gradient(circle at 50% 40%, rgba(94,234,212,.4), transparent 50%),
+        rgba(5,5,8,.55);
+    }
+    @keyframes fxFlash {
+      0% { opacity: 0; }
+      40% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .fx-badge {
+      position: fixed; left: 50%; top: 46%; z-index: 201;
+      transform: translate(-50%, -40%) scale(.85);
+      opacity: 0; visibility: hidden; pointer-events: none;
+      font-family: var(--mono); font-size: .8rem; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--accent); padding: .8rem 1.2rem; border-radius: 999px;
+      border: 1px solid rgba(94,234,212,.45); background: rgba(9,9,11,.88);
+      box-shadow: 0 0 40px rgba(94,234,212,.22);
+    }
+    .fx-badge.go {
+      visibility: visible;
+      animation: fxBadge .75s cubic-bezier(.22,1,.36,1) forwards;
+    }
+    @keyframes fxBadge {
+      0% { opacity: 0; transform: translate(-50%, -40%) scale(.85); }
+      40% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+      100% { opacity: 0; transform: translate(-50%, -58%) scale(1); }
+    }
+
+    .overlay .card.launch-out {
+      animation: launchOut .45s ease forwards;
+    }
+    @keyframes launchOut {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.06); opacity: 0; }
+    }
+
+    .screen.fade-out {
+      animation: screenOut .4s ease forwards;
+    }
+    @keyframes screenOut {
+      to { opacity: 0; transform: translateY(10px); }
+    }
+  </style>
+
+<style>*,*::before,*::after{animation:none!important;transition:none!important}</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="fx" id="fx" aria-hidden="true"></div>
+  <div class="fx-badge" id="fxBadge" aria-hidden="true"></div>
+
+  <section class="screen on" id="beta">
+    <div class="gate">
+      <div class="card">
+        <div class="brand-row">
+          <img src="../logo.png" alt="" />
+          <div><strong>Tomasek Plays</strong><div style="color:var(--muted);font-size:.8rem">Arcade beta</div></div>
+        </div>
+        <h1>Try Beta mode</h1>
+        <p>Enter a beta code to unlock the arcade.</p>
+        <form id="betaForm">
+          <label class="f">Beta code <input id="betaCode" maxlength="8" inputmode="numeric" placeholder="Enter code" autocomplete="off" required /></label>
+          <p class="err" id="betaErr"></p>
+          <button class="btn btn-a" type="submit">Try Beta mode</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="device">
+    <div class="gate">
+      <div class="card">
+        <h1>Choose your setup</h1>
+        <p>Mobile turns zoom off. PC can keep zoom on.</p>
+        <div class="devs">
+          <button type="button" class="dev on" data-d="pc"><strong>PC</strong><span>Keyboard · zoom ok</span></button>
+          <button type="button" class="dev" data-d="mobile"><strong>Mobile</strong><span>Touch · zoom off</span></button>
+        </div>
+        <button type="button" class="btn btn-a" id="goArcade">Enter arcade</button>
+        <div style="margin-top:.7rem"><button type="button" class="btn btn-g" id="btnHomeDevice" style="width:100%">Back home</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="hub">
+    <div class="wrap">
+      <header class="nav">
+        <div class="brand">
+          <a class="yt-logo" href="https://www.youtube.com/@TomasekPlays" target="_blank" rel="noopener noreferrer" title="TomasekPlays on YouTube">
+            <img src="../logo.png" alt="TomasekPlays YouTube" />
+          </a>
+          <a href="../index.html" id="brandHome">TomasekPlays</a>
+        </div>
+        <div class="nav-r">
+          <span class="chip">device <b id="devChip">PC</b></span>
+          <button type="button" class="ico" id="btnSet1" title="Settings">⚙</button>
+          <button type="button" class="btn btn-g" id="btnSwitch" style="padding:.5rem .85rem;font-size:.82rem">Switch device</button>
+          <button type="button" class="btn-home" id="btnHome">← Home</button>
+        </div>
+      </header>
+      <div class="head">
+        <h2>Pick a game. Play here.</h2>
+        <p>Everything runs on this page — tap a card to start.</p>
+      </div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section class="screen" id="player">
+    <div class="pbar">
+      <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
+        <button type="button" class="btn btn-g" id="btnBack" style="padding:.45rem .8rem;font-size:.85rem">← Arcade</button>
+        <button type="button" class="btn-home" id="btnHomePlay" style="padding:.45rem .8rem;font-size:.85rem">← Home</button>
+        <strong id="pTitle">Game</strong>
+      </div>
+      <div style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap">
+        <span class="pill">score <b id="score">0</b></span>
+        <span class="pill">best <b id="best">0</b></span>
+        <button type="button" class="ico" id="btnSet2">⚙</button>
+        <button type="button" class="btn btn-a" id="btnRestart" style="width:auto;padding:.45rem .9rem;font-size:.85rem">Restart</button>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="canvas-wrap" id="cvWrap"><canvas id="cv" width="360" height="480"></canvas></div>
+      <div id="dom"></div>
+      <p class="hint" id="hint"></p>
+      <div class="pad one" id="pad"></div>
+    </div>
+  </section>
+
+  <div class="overlay" id="settings">
+    <div class="card" style="width:min(440px,100%)">
+      <h1>Settings</h1>
+      <p>Saved on this device.</p>
+      <div class="row"><div><span>Sound</span><small>Beeps while playing</small></div><button type="button" class="tog on" id="togSound"></button></div>
+      <div class="row"><div><span>Difficulty</span><small>Default for new games</small></div>
+        <select id="diff" style="width:auto"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select>
+      </div>
+      <div class="row"><div><span>PC zoom</span><small>Only in PC mode</small></div><button type="button" class="tog on" id="togZoom"></button></div>
+      <div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap">
+        <button type="button" class="btn btn-g" id="resetScores" style="flex:1">Reset scores</button>
+        <button type="button" class="btn btn-a" id="closeSet" style="flex:1;width:auto">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="launch">
+    <div class="card" style="width:min(440px,100%)">
+      <div class="brand-row" style="margin-bottom:.4rem">
+        <span id="launchEmoji" style="font-size:1.6rem">🎮</span>
+        <div>
+          <strong id="launchName">Game</strong>
+          <div style="color:var(--muted);font-size:.8rem" id="launchBlurb">Options</div>
+        </div>
+      </div>
+      <h1 style="font-size:1.15rem;margin-top:.5rem">Before you play</h1>
+      <p style="margin-bottom:.75rem">Pick difficulty<span id="launchModeLabel"> and opponent</span>.</p>
+
+      <div style="margin-bottom:.85rem">
+        <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem">Difficulty</div>
+        <div class="devs" id="diffPick" style="grid-template-columns:1fr 1fr 1fr">
+          <button type="button" class="dev" data-diff="easy"><strong>Easy</strong></button>
+          <button type="button" class="dev on" data-diff="normal"><strong>Normal</strong></button>
+          <button type="button" class="dev" data-diff="hard"><strong>Hard</strong></button>
+        </div>
+      </div>
+
+      <div id="modeBlock" style="margin-bottom:.85rem">
+        <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem">Players</div>
+        <div class="devs" id="modePick">
+          <button type="button" class="dev on" data-mode="bot"><strong>vs Bot</strong><span>Play against AI</span></button>
+          <button type="button" class="dev" data-mode="2p"><strong>2 Players</strong><span>Share one device</span></button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button type="button" class="btn btn-g" id="launchCancel" style="flex:1">Cancel</button>
+        <button type="button" class="btn btn-a" id="launchStart" style="flex:1;width:auto">Start game</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function () {
+  const CODES = ["4949", "148", "312"];
+  const K = { beta: "tomasekBetaUnlocked", device: "tomasekDevice", set: "tomasekSettings", scores: "tomasekScores" };
+
+  const cv = document.getElementById("cv");
+  const ctx = cv.getContext("2d");
+  const dom = document.getElementById("dom");
+  const pad = document.getElementById("pad");
+
+  let device = localStorage.getItem(K.device) || "pc";
+  let settings = Object.assign({ sound: true, difficulty: "normal", pcZoom: true, mode: "bot" }, JSON.parse(localStorage.getItem(K.set) || "{}"));
+  let scores = JSON.parse(localStorage.getItem(K.scores) || "{}");
+  let current = null;
+  let pending = null;
+  let playDiff = "normal";
+  let playMode = "bot";
+  let runId = 0;
+  let raf = 0;
+  let input = { action: false, up: false, down: false, left: false, right: false, p2up: false, p2down: false };
+  let pulses = new Set();
+
+  const GAMES = [
+    { id: "flappy", name: "Flappy Duck", emoji: "🦆", blurb: "Space / tap to flap", pad: "one" },
+    { id: "snake", name: "Neon Snake", emoji: "🐍", blurb: "Arrow keys to steer", pad: "dir", wide: true },
+    { id: "pong", name: "Pulse Pong", emoji: "🏓", blurb: "Bot or 2 players", pad: "dir", wide: true, versus: true },
+    { id: "breakout", name: "Brick Pulse", emoji: "🧱", blurb: "Move · break bricks", pad: "dir", wide: true },
+    { id: "dodge", name: "Asteroid Dodge", emoji: "☄️", blurb: "Move to survive", pad: "dir" },
+    { id: "catcher", name: "Orb Catch", emoji: "✨", blurb: "Catch good orbs", pad: "dir", wide: true },
+    { id: "runner", name: "Dash Runner", emoji: "🏃", blurb: "Jump the gaps", pad: "one", wide: true },
+    { id: "shooter", name: "Sky Blaster", emoji: "🚀", blurb: "Move + shoot", pad: "dir" },
+    { id: "reaction", name: "Reaction Lab", emoji: "⚡", blurb: "Tap when it flashes", pad: "one", wide: true },
+    { id: "stack", name: "Stack Drop", emoji: "📦", blurb: "Tap to drop blocks", pad: "one" },
+    { id: "whack", name: "Tap Targets", emoji: "🎯", blurb: "Tap the circles", pad: "one", wide: true },
+    { id: "aim", name: "Precision Aim", emoji: "🏹", blurb: "Tap the moving mark", pad: "one", wide: true },
+    { id: "memory", name: "Memory Match", emoji: "🧠", blurb: "Find all pairs", pad: "none", dom: true },
+    { id: "ttt", name: "Tic Tac Toe", emoji: "⭕", blurb: "Bot or 2 players", pad: "none", dom: true, versus: true },
+    { id: "merge", name: "Merge 2048", emoji: "🔢", blurb: "Swipe or arrows", pad: "dir", dom: true, wide: true },
+  ];
+
+  function $(id) { return document.getElementById(id); }
+  function show(id) {
+    ["beta", "device", "hub", "player"].forEach((s) => $(s).classList.toggle("on", s === id));
+  }
+  function mul() { return playDiff === "easy" ? 0.7 : playDiff === "hard" ? 1.45 : 1; }
+  function botSkill() {
+    // higher = stronger bot tracking (kept a bit slower overall)
+    return playDiff === "easy" ? 0.035 : playDiff === "hard" ? 0.11 : 0.065;
+  }
+  function botThinkMs() {
+    // AI "thinks" for ~0.5–1.5 seconds
+    if (playDiff === "easy") return rand(900, 1500);
+    if (playDiff === "hard") return rand(500, 900);
+    return rand(700, 1200);
+  }
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+  function saveSet() { localStorage.setItem(K.set, JSON.stringify(settings)); }
+  function saveScores() { localStorage.setItem(K.scores, JSON.stringify(scores)); }
+
+  function beep(kind) {
+    if (!settings.sound) return;
+    try {
+      const ac = new (window.AudioContext || window.webkitAudioContext)();
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.connect(g); g.connect(ac.destination);
+      o.frequency.value = kind === "bad" ? 150 : kind === "win" ? 640 : 400;
+      g.gain.value = 0.03;
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.1);
+      o.stop(ac.currentTime + 0.11);
+      setTimeout(() => ac.close(), 180);
+    } catch (e) {}
+  }
+
+  function setScore(n) {
+    $("score").textContent = typeof n === "number" ? String(Math.floor(n)) : String(n);
+  }
+  function best(id, n) {
+    scores[id] = Math.max(scores[id] || 0, Math.floor(n));
+    saveScores();
+    $("best").textContent = String(scores[id]);
+  }
+
+  function setViewport() {
+    const mobile = device === "mobile";
+    document.body.classList.toggle("is-mobile", mobile);
+    $("devChip").textContent = device.toUpperCase();
+    const meta = $("viewportMeta");
+    if (mobile || !settings.pcZoom) {
+      meta.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no");
+    } else {
+      meta.setAttribute("content", "width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes");
+    }
+  }
+
+  function stopGame() {
+    runId++;
+    cancelAnimationFrame(raf);
+    raf = 0;
+    input = { action: false, up: false, down: false, left: false, right: false, p2up: false, p2down: false };
+    pulses = new Set();
+    window.onkeydown = null;
+    window.onkeyup = null;
+    cv.onpointerdown = null;
+    cv.onpointermove = null;
+    cv.onclick = null;
+  }
+
+  function sizeCanvas(wide) {
+    if (wide) { cv.width = 480; cv.height = 360; }
+    else { cv.width = 360; cv.height = 480; }
+  }
+
+  function clear(color) {
+    ctx.fillStyle = color || "#0b0d12";
+    ctx.fillRect(0, 0, cv.width, cv.height);
+  }
+
+  function loop(id, fn) {
+    const my = id;
+    function frame(t) {
+      if (my !== runId) return;
+      fn(t);
+      if (my === runId) raf = requestAnimationFrame(frame);
+    }
+    raf = requestAnimationFrame(frame);
+  }
+
+  function bindKeys() {
+    const two = playMode === "2p" && current && current.versus;
+    window.onkeydown = (e) => {
+      let k = null;
+      if (two) {
+        // P1: W/S · P2: arrows
+        const m2 = { Space: "action", Enter: "action", KeyW: "up", KeyS: "down", KeyA: "left", KeyD: "right", ArrowUp: "p2up", ArrowDown: "p2down", ArrowLeft: "left", ArrowRight: "right" };
+        k = m2[e.code];
+      } else {
+        const m = { Space: "action", Enter: "action", ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
+        k = m[e.code];
+      }
+      if (!k) return;
+      e.preventDefault();
+      if (!e.repeat) pulses.add(k);
+      input[k] = true;
+    };
+    window.onkeyup = (e) => {
+      let k = null;
+      if (two) {
+        const m2 = { Space: "action", Enter: "action", KeyW: "up", KeyS: "down", KeyA: "left", KeyD: "right", ArrowUp: "p2up", ArrowDown: "p2down", ArrowLeft: "left", ArrowRight: "right" };
+        k = m2[e.code];
+      } else {
+        const m = { Space: "action", Enter: "action", ArrowUp: "up", KeyW: "up", ArrowDown: "down", KeyS: "down", ArrowLeft: "left", KeyA: "left", ArrowRight: "right", KeyD: "right" };
+        k = m[e.code];
+      }
+      if (k) input[k] = false;
+    };
+  }
+
+  function eat(key) {
+    if (!pulses.has(key)) return false;
+    pulses.delete(key);
+    return true;
+  }
+
+  function pointerPos(e) {
+    const r = cv.getBoundingClientRect();
+    return {
+      x: ((e.clientX - r.left) / r.width) * cv.width,
+      y: ((e.clientY - r.top) / r.height) * cv.height,
+    };
+  }
+
+  function setupPad(type) {
+    if (type === "none") {
+      pad.style.display = "none";
+      pad.innerHTML = "";
+      return;
+    }
+    pad.style.display = "";
+    const twoPong = playMode === "2p" && current && current.id === "pong";
+    if (twoPong) {
+      pad.className = "pad";
+      pad.style.display = "grid";
+      pad.style.gridTemplateColumns = "1fr 1fr";
+      pad.style.gap = ".5rem";
+      pad.innerHTML = `
+        <div style="display:grid;gap:.4rem">
+          <button type="button" data-k="up">P1 ▲</button>
+          <button type="button" data-k="down">P1 ▼</button>
+        </div>
+        <div style="display:grid;gap:.4rem">
+          <button type="button" data-k="p2up">P2 ▲</button>
+          <button type="button" data-k="p2down">P2 ▼</button>
+        </div>`;
+    } else {
+      pad.style.gridTemplateColumns = "";
+      pad.className = "pad " + (type === "dir" ? "dir" : "one");
+      if (type === "dir") {
+        pad.innerHTML = `
+          <button type="button" class="u" data-k="up">▲</button>
+          <button type="button" class="l" data-k="left">◀</button>
+          <button type="button" class="a" data-k="action">●</button>
+          <button type="button" class="r" data-k="right">▶</button>`;
+      } else {
+        pad.innerHTML = `<button type="button" data-k="action">TAP / ACTION</button>`;
+      }
+    }
+    pad.querySelectorAll("button").forEach((b) => {
+      const down = (e) => {
+        e.preventDefault();
+        pulses.add(b.dataset.k);
+        input[b.dataset.k] = true;
+        try { b.setPointerCapture(e.pointerId); } catch (_) {}
+      };
+      const up = (e) => {
+        e.preventDefault();
+        input[b.dataset.k] = false;
+      };
+      b.onpointerdown = down;
+      b.onpointerup = up;
+      b.onpointercancel = up;
+      b.onlostpointercapture = () => { input[b.dataset.k] = false; };
+    });
+  }
+
+  function renderGrid() {
+    $("grid").innerHTML = GAMES.map((g) => `
+      <button type="button" class="gcard" data-id="${g.id}">
+        <div><div class="e">${g.emoji}</div><h3>${g.name}</h3><p>${g.blurb}</p></div>
+        <div class="m">best ${scores[g.id] || 0}</div>
+      </button>`).join("");
+    $("grid").querySelectorAll(".gcard").forEach((btn) => {
+      btn.onclick = () => openLaunch(btn.dataset.id);
+    });
+  }
+
+  function openLaunch(id) {
+    const g = GAMES.find((x) => x.id === id);
+    if (!g) return;
+    pending = g;
+    playDiff = settings.difficulty || "normal";
+    playMode = settings.mode || "bot";
+    $("launchEmoji").textContent = g.emoji;
+    $("launchName").textContent = g.name;
+    $("launchBlurb").textContent = g.blurb;
+    $("modeBlock").style.display = g.versus ? "block" : "none";
+    $("launchModeLabel").style.display = g.versus ? "inline" : "none";
+    document.querySelectorAll("#diffPick .dev").forEach((b) => b.classList.toggle("on", b.dataset.diff === playDiff));
+    document.querySelectorAll("#modePick .dev").forEach((b) => b.classList.toggle("on", b.dataset.mode === playMode));
+    $("launch").classList.add("on");
+  }
+
+  function playFx(label, playStyle, then) {
+    const fx = $("fx");
+    const badge = $("fxBadge");
+    fx.className = "fx go" + (playStyle ? " play" : "");
+    badge.textContent = label;
+    badge.className = "fx-badge go";
+    setTimeout(() => {
+      fx.className = "fx";
+      badge.className = "fx-badge";
+      if (then) then();
+    }, 720);
+  }
+
+  function goHome(e) {
+    if (e) e.preventDefault();
+    stopGame();
+    const on = document.querySelector(".screen.on");
+    if (on) on.classList.add("fade-out");
+    playFx("Back to home", false, () => {
+      window.location.href = "index.html";
+    });
+  }
+
+  function beginPending() {
+    if (!pending || beginPending._busy) return;
+    beginPending._busy = true;
+    settings.difficulty = playDiff;
+    settings.mode = playMode;
+    saveSet();
+    $("diff").value = playDiff;
+    const id = pending.id;
+    const card = $("launch").querySelector(".card");
+    if (card) {
+      card.classList.remove("launch-out");
+      void card.offsetWidth;
+      card.classList.add("launch-out");
+    }
+    playFx("Starting " + (pending.name || "game"), true, () => {
+      $("launch").classList.remove("on");
+      if (card) card.classList.remove("launch-out");
+      pending = null;
+      beginPending._busy = false;
+      openGame(id);
+    });
+  }
+
+  function openGame(id) {
+    const g = GAMES.find((x) => x.id === id);
+    if (!g) return;
+    current = g;
+    $("pTitle").textContent = g.name + (g.versus ? (playMode === "2p" ? " · 2P" : " · Bot") : "") + " · " + playDiff;
+    $("best").textContent = String(scores[id] || 0);
+    setScore(0);
+    let hint = g.blurb;
+    if (g.id === "pong" && playMode === "2p") hint = "P1: W/S · P2: ↑/↓";
+    else if (g.id === "ttt" && playMode === "2p") hint = "Take turns on the same device";
+    else if (g.versus && playMode === "bot") hint = "Playing vs bot (" + playDiff + ")";
+    hint += device === "pc" ? " · keyboard / mouse" : " · touch controls";
+    $("hint").textContent = hint;
+    setupPad(g.pad);
+    show("player");
+    startGame();
+  }
+
+  function startGame() {
+    if (!current) return;
+    stopGame();
+    bindKeys();
+    const id = runId;
+    dom.style.display = current.dom ? "block" : "none";
+    $("cvWrap").style.display = current.dom ? "none" : "block";
+    if (!current.dom) sizeCanvas(!!current.wide);
+    clear("#0b0d12");
+    setScore(0);
+    try {
+      const starters = {
+        flappy, snake, pong, breakout, dodge, catcher, runner, shooter,
+        reaction, stack, whack, aim, memory, ttt, merge,
+      };
+      starters[current.id](id);
+    } catch (err) {
+      console.error(err);
+      clear("#200");
+      ctx.fillStyle = "#fff";
+      ctx.font = "16px sans-serif";
+      ctx.fillText("Error: " + err.message, 20, 40);
+    }
+  }
+
+  /* -------- games -------- */
+  function flappy(id) {
+    const W = cv.width, H = cv.height;
+    let birdY = H * 0.45, vel = 0, pipes = [], score = 0, dead = false, started = false, t = 0;
+    const gap = 140 / Math.sqrt(mul());
+    const spawn = () => {
+      const top = rand(70, H - gap - 90);
+      pipes.push({ x: W + 10, top, passed: false });
+    };
+    cv.onpointerdown = () => { pulses.add("action"); input.action = true; };
+    loop(id, () => {
+      if (eat("action") || eat("up")) {
+        if (dead) { startGame(); return; }
+        started = true;
+        vel = -6.4;
+        beep();
+      }
+      clear("#0b1220");
+      ctx.fillStyle = "#122018"; ctx.fillRect(0, H - 30, W, 30);
+
+      if (started && !dead) {
+        t++;
+        vel += 0.32 * mul();
+        birdY += vel;
+        if (t % Math.max(50, Math.floor(85 / mul())) === 0) spawn();
+        if (pipes.length === 0) spawn();
+        pipes.forEach((p) => p.x -= 2.6 * mul());
+        pipes = pipes.filter((p) => p.x > -50);
+        for (const p of pipes) {
+          ctx.fillStyle = "#5eead4";
+          ctx.fillRect(p.x, 0, 46, p.top);
+          ctx.fillRect(p.x, p.top + gap, 46, H);
+          if (!p.passed && p.x + 46 < 80) { p.passed = true; score++; setScore(score); best("flappy", score); beep("win"); }
+          if (80 + 12 > p.x && 80 - 12 < p.x + 46 && (birdY - 12 < p.top || birdY + 12 > p.top + gap)) dead = true;
+        }
+        if (birdY > H - 42 || birdY < 10) dead = true;
+        if (dead) beep("bad");
+      }
+
+      ctx.fillStyle = "#e8d5b7";
+      ctx.beginPath(); ctx.arc(80, birdY, 14, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#04120f";
+      ctx.beginPath(); ctx.arc(86, birdY - 3, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#f59e0b";
+      ctx.beginPath(); ctx.moveTo(92, birdY); ctx.lineTo(104, birdY + 3); ctx.lineTo(92, birdY + 7); ctx.fill();
+
+      if (!started) {
+        ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "#f4f4f0"; ctx.font = "700 20px Space Grotesk"; ctx.textAlign = "center";
+        ctx.fillText("Tap / Space to start", W / 2, H / 2);
+      }
+      if (dead) {
+        ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(0, 0, W, H);
+        ctx.fillStyle = "#f4f4f0"; ctx.font = "700 20px Space Grotesk"; ctx.textAlign = "center";
+        ctx.fillText("Game over · tap to retry", W / 2, H / 2);
+      }
+      ctx.textAlign = "left";
+    });
+  }
+
+  function snake(id) {
+    const cell = 20, cols = (cv.width / cell) | 0, rows = (cv.height / cell) | 0;
+    let body = [{ x: 5, y: 8 }], dir = { x: 1, y: 0 }, next = { x: 1, y: 0 }, food = { x: 12, y: 8 }, score = 0, acc = 0, last = performance.now();
+    const place = () => {
+      do { food = { x: (Math.random() * cols) | 0, y: (Math.random() * rows) | 0 }; }
+      while (body.some((s) => s.x === food.x && s.y === food.y));
+    };
+    place();
+    loop(id, (now) => {
+      if (eat("up") && dir.y !== 1) next = { x: 0, y: -1 };
+      if (eat("down") && dir.y !== -1) next = { x: 0, y: 1 };
+      if (eat("left") && dir.x !== 1) next = { x: -1, y: 0 };
+      if (eat("right") && dir.x !== -1) next = { x: 1, y: 0 };
+      acc += (now - last) / 1000; last = now;
+      const step = 1 / (6.5 * mul());
+      while (acc >= step) {
+        acc -= step;
+        dir = next;
+        const h = { x: body[0].x + dir.x, y: body[0].y + dir.y };
+        if (h.x < 0 || h.y < 0 || h.x >= cols || h.y >= rows || body.some((s) => s.x === h.x && s.y === h.y)) {
+          beep("bad"); startGame(); return;
+        }
+        body.unshift(h);
+        if (h.x === food.x && h.y === food.y) { score++; setScore(score); best("snake", score); beep("win"); place(); }
+        else body.pop();
+      }
+      clear();
+      ctx.fillStyle = "#e8d5b7"; ctx.fillRect(food.x * cell + 2, food.y * cell + 2, cell - 4, cell - 4);
+      ctx.fillStyle = "#5eead4";
+      body.forEach((s, i) => { ctx.globalAlpha = Math.max(0.35, 1 - i * 0.04); ctx.fillRect(s.x * cell + 1, s.y * cell + 1, cell - 2, cell - 2); });
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  function pong(id) {
+    const W = cv.width, H = cv.height;
+    const two = playMode === "2p";
+    let py = H / 2 - 40, ey = H / 2 - 40;
+    let ball = { x: W / 2, y: H / 2, vx: 3.3 * mul(), vy: 2 };
+    let s1 = 0, s2 = 0;
+    let botReactUntil = 0;
+    setScore(0);
+    if (!two) cv.onpointermove = (e) => { py = pointerPos(e).y - 40; };
+    loop(id, () => {
+      if (input.up) py -= 5.5;
+      if (input.down) py += 5.5;
+      py = clamp(py, 0, H - 80);
+      if (two) {
+        if (input.p2up) ey -= 5.5;
+        if (input.p2down) ey += 5.5;
+      } else {
+        const now = performance.now();
+        // brief "thinking" pause when ball comes toward the bot
+        if (ball.vx > 0 && ball.x > W * 0.45 && now > botReactUntil) {
+          botReactUntil = now + (playDiff === "easy" ? rand(180, 420) : playDiff === "hard" ? rand(60, 140) : rand(100, 260));
+        }
+        if (now >= botReactUntil || ball.vx <= 0) {
+          const track = botSkill() * (playDiff === "hard" ? 1.05 : 1);
+          const maxSpd = playDiff === "easy" ? 2.6 : playDiff === "hard" ? 3.6 : 3.1;
+          ey += clamp((ball.y - ey - 40) * track * 8, -maxSpd, maxSpd);
+        }
+      }
+      ey = clamp(ey, 0, H - 80);
+      ball.x += ball.vx; ball.y += ball.vy;
+      if (ball.y < 8 || ball.y > H - 8) ball.vy *= -1;
+      if (ball.x < 26 && ball.y > py && ball.y < py + 80) { ball.vx = Math.abs(ball.vx) * 1.03; ball.x = 26; beep(); }
+      if (ball.x > W - 26 && ball.y > ey && ball.y < ey + 80) { ball.vx = -Math.abs(ball.vx) * 1.03; ball.x = W - 26; beep(); }
+      if (ball.x < 0) {
+        if (two) { s2++; setScore(s1 + " - " + s2); beep("bad"); }
+        else { beep("bad"); startGame(); return; }
+        ball = { x: W / 2, y: H / 2, vx: 3.3 * mul(), vy: rand(-2.5, 2.5) };
+      }
+      if (ball.x > W) {
+        if (two) { s1++; setScore(s1 + " - " + s2); beep("win"); }
+        else { s1++; setScore(s1); best("pong", s1); beep("win"); }
+        ball = { x: W / 2, y: H / 2, vx: -3.3 * mul(), vy: rand(-2.5, 2.5) };
+      }
+      clear();
+      ctx.fillStyle = "#5eead4"; ctx.fillRect(10, py, 10, 80);
+      ctx.fillStyle = two ? "#e8d5b7" : "#5eead4"; ctx.fillRect(W - 20, ey, 10, 80);
+      ctx.fillStyle = "#f4f4f0";
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, 7, 0, Math.PI * 2); ctx.fill();
+      if (two) {
+        ctx.font = "600 14px Space Grotesk"; ctx.fillStyle = "rgba(244,244,240,.5)";
+        ctx.fillText("P1 " + s1, 20, 24); ctx.fillText("P2 " + s2, W - 70, 24);
+      }
+    });
+  }
+
+  function breakout(id) {
+    const W = cv.width, H = cv.height;
+    let px = W / 2 - 40, ball = { x: W / 2, y: H - 70, vx: 3 * mul(), vy: -3.2 * mul() }, score = 0;
+    const bricks = [];
+    for (let r = 0; r < 5; r++) for (let c = 0; c < 8; c++) bricks.push({ x: 20 + c * ((W - 40) / 8), y: 40 + r * 22, w: (W - 40) / 8 - 4, alive: true });
+    cv.onpointermove = (e) => { px = pointerPos(e).x - 40; };
+    loop(id, () => {
+      if (input.left) px -= 6; if (input.right) px += 6;
+      px = clamp(px, 0, W - 80);
+      ball.x += ball.vx; ball.y += ball.vy;
+      if (ball.x < 8 || ball.x > W - 8) ball.vx *= -1;
+      if (ball.y < 8) ball.vy *= -1;
+      if (ball.y > H - 26 && ball.x > px && ball.x < px + 80) { ball.vy = -Math.abs(ball.vy); ball.y = H - 26; }
+      if (ball.y > H) { beep("bad"); startGame(); return; }
+      bricks.forEach((b) => {
+        if (!b.alive) return;
+        if (ball.x > b.x && ball.x < b.x + b.w && ball.y > b.y && ball.y < b.y + 16) {
+          b.alive = false; ball.vy *= -1; score += 10; setScore(score); best("breakout", score); beep("win");
+        }
+      });
+      if (bricks.every((b) => !b.alive)) { score += 100; setScore(score); best("breakout", score); startGame(); return; }
+      clear();
+      ctx.fillStyle = "#5eead4"; ctx.fillRect(px, H - 18, 80, 10);
+      ctx.beginPath(); ctx.arc(ball.x, ball.y, 6, 0, Math.PI * 2); ctx.fill();
+      bricks.forEach((b, i) => { if (!b.alive) return; ctx.fillStyle = i % 2 ? "#5eead4" : "#e8d5b7"; ctx.fillRect(b.x, b.y, b.w, 16); });
+    });
+  }
+
+  function dodge(id) {
+    const W = cv.width, H = cv.height;
+    let p = { x: W / 2, y: H - 80 }, rocks = [], score = 0, t = 0;
+    loop(id, () => {
+      const sp = 3.4 * mul();
+      if (input.left) p.x -= sp; if (input.right) p.x += sp; if (input.up) p.y -= sp; if (input.down) p.y += sp;
+      p.x = clamp(p.x, 16, W - 16); p.y = clamp(p.y, 16, H - 16);
+      t++;
+      if (t % Math.max(14, (30 / mul()) | 0) === 0) rocks.push({ x: rand(16, W - 16), y: -20, r: rand(12, 22), vy: rand(2.2, 4.2) * mul() });
+      rocks.forEach((r) => r.y += r.vy);
+      rocks = rocks.filter((r) => r.y < H + 40);
+      if (t % 25 === 0) { score++; setScore(score); best("dodge", score); }
+      for (const r of rocks) if (Math.hypot(r.x - p.x, r.y - p.y) < r.r + 12) { beep("bad"); startGame(); return; }
+      clear();
+      ctx.fillStyle = "#5eead4"; ctx.beginPath(); ctx.arc(p.x, p.y, 12, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = "#94a3b8"; rocks.forEach((r) => { ctx.beginPath(); ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2); ctx.fill(); });
+    });
+  }
+
+  function catcher(id) {
+    const W = cv.width, H = cv.height;
+    let px = W / 2, orbs = [], score = 0, t = 0;
+    cv.onpointermove = (e) => { px = pointerPos(e).x; };
+    loop(id, () => {
+      if (input.left) px -= 7; if (input.right) px += 7;
+      px = clamp(px, 36, W - 36); t++;
+      if (t % Math.max(16, (36 / mul()) | 0) === 0) orbs.push({ x: rand(20, W - 20), y: -10, vy: rand(2, 3.8) * mul(), good: Math.random() > 0.22 });
+      orbs.forEach((o) => o.y += o.vy);
+      orbs = orbs.filter((o) => {
+        if (o.y > H - 40 && Math.abs(o.x - px) < 42) {
+          if (o.good) { score += 5; setScore(score); best("catcher", score); beep("win"); }
+          else { score = Math.max(0, score - 8); setScore(score); beep("bad"); }
+          return false;
+        }
+        return o.y < H + 20;
+      });
+      clear();
+      ctx.fillStyle = "#5eead4"; ctx.fillRect(px - 36, H - 28, 72, 14);
+      orbs.forEach((o) => { ctx.fillStyle = o.good ? "#e8d5b7" : "#f87171"; ctx.beginPath(); ctx.arc(o.x, o.y, 9, 0, Math.PI * 2); ctx.fill(); });
+    });
+  }
+
+  function runner(id) {
+    const W = cv.width, H = cv.height;
+    let y = H - 80, v = 0, ground = true, obs = [], score = 0, t = 0;
+    cv.onpointerdown = () => { pulses.add("action"); input.action = true; };
+    loop(id, () => {
+      if (eat("action") || eat("up")) { if (ground) { v = -11; ground = false; beep(); } }
+      t++;
+      const speed = 4 * mul() + t * 0.004;
+      v += 0.55; y += v;
+      if (y >= H - 80) { y = H - 80; v = 0; ground = true; }
+      if (t % Math.max(35, (65 / mul()) | 0) === 0) obs.push({ x: W + 10, w: 26, h: rand(28, 52) });
+      obs.forEach((o) => o.x -= speed);
+      obs = obs.filter((o) => o.x > -40);
+      if (t % 10 === 0) { score++; setScore(score); best("runner", score); }
+      for (const o of obs) {
+        if (70 < o.x + o.w && 94 > o.x && y + 24 > H - 40 - o.h) { beep("bad"); startGame(); return; }
+      }
+      clear();
+      ctx.fillStyle = "#1a2330"; ctx.fillRect(0, H - 40, W, 40);
+      ctx.fillStyle = "#5eead4"; ctx.fillRect(70, y, 24, 24);
+      ctx.fillStyle = "#e8d5b7"; obs.forEach((o) => ctx.fillRect(o.x, H - 40 - o.h, o.w, o.h));
+    });
+  }
+
+  function shooter(id) {
+    const W = cv.width, H = cv.height;
+    let px = W / 2, bullets = [], foes = [], score = 0, t = 0;
+    cv.onpointerdown = (e) => { px = pointerPos(e).x; pulses.add("action"); input.action = true; };
+    loop(id, () => {
+      if (input.left) px -= 5; if (input.right) px += 5;
+      px = clamp(px, 18, W - 18);
+      if (eat("action")) { bullets.push({ x: px, y: H - 55 }); beep(); }
+      t++;
+      if (t % Math.max(22, (42 / mul()) | 0) === 0) foes.push({ x: rand(20, W - 20), y: -16, vy: rand(1.6, 3) * mul(), r: 14 });
+      bullets.forEach((b) => b.y -= 8);
+      foes.forEach((f) => f.y += f.vy);
+      bullets = bullets.filter((b) => b.y > -10);
+      foes = foes.filter((f) => {
+        if (f.y > H) { score = Math.max(0, score - 5); setScore(score); return false; }
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          if (Math.hypot(bullets[i].x - f.x, bullets[i].y - f.y) < f.r + 4) {
+            bullets.splice(i, 1); score += 10; setScore(score); best("shooter", score); beep("win"); return false;
+          }
+        }
+        return true;
+      });
+      clear();
+      ctx.fillStyle = "#5eead4";
+      ctx.beginPath(); ctx.moveTo(px, H - 55); ctx.lineTo(px - 12, H - 30); ctx.lineTo(px + 12, H - 30); ctx.fill();
+      ctx.fillStyle = "#e8d5b7"; bullets.forEach((b) => ctx.fillRect(b.x - 2, b.y, 4, 10));
+      ctx.fillStyle = "#f87171"; foes.forEach((f) => { ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2); ctx.fill(); });
+    });
+  }
+
+  function reaction(id) {
+    const W = cv.width, H = cv.height;
+    let mode = "wait", until = performance.now() + rand(800, 2200) / mul(), flash = 0, score = 0;
+    cv.onpointerdown = () => { pulses.add("action"); input.action = true; };
+    loop(id, () => {
+      const now = performance.now();
+      if (mode === "wait" && now >= until) { mode = "go"; flash = now; beep(); }
+      if (eat("action")) {
+        if (mode === "wait") { mode = "fail"; beep("bad"); until = now + 900; }
+        else if (mode === "go") {
+          const pts = Math.max(0, Math.round(500 - (now - flash)));
+          score += pts; setScore(score); best("reaction", score); beep("win");
+          mode = "wait"; until = now + rand(900, 2200) / mul();
+        } else if (mode === "fail" && now > until) { mode = "wait"; until = now + rand(900, 2200) / mul(); }
+      }
+      if (mode === "fail" && now > until) { mode = "wait"; until = now + rand(900, 2200) / mul(); }
+      ctx.fillStyle = mode === "go" ? "#134e4a" : "#0b0d12";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#f4f4f0"; ctx.font = "700 22px Space Grotesk"; ctx.textAlign = "center";
+      ctx.fillText(mode === "go" ? "TAP!" : mode === "fail" ? "Too early" : "Wait for teal…", W / 2, H / 2);
+      ctx.textAlign = "left";
+    });
+  }
+
+  function stack(id) {
+    const W = cv.width, H = cv.height;
+    let phase = 0, speed = 2.6 * mul(), stack = [{ x: W / 2 - 50, w: 100 }], score = 0;
+    cv.onpointerdown = () => { pulses.add("action"); input.action = true; };
+    loop(id, () => {
+      const prev = stack[stack.length - 1];
+      const x = (Math.sin(phase) * 0.5 + 0.5) * (W - prev.w);
+      phase += 0.04 * speed;
+      if (eat("action")) {
+        const left = Math.max(prev.x, x), right = Math.min(prev.x + prev.w, x + prev.w), w = right - left;
+        if (w < 10) { beep("bad"); startGame(); return; }
+        stack.push({ x: left, w }); score++; setScore(score); best("stack", score); beep("win"); speed += 0.12 * mul();
+      }
+      clear();
+      stack.forEach((s, i) => {
+        const yy = H - 36 - (stack.length - i) * 26;
+        ctx.fillStyle = i % 2 ? "#5eead4" : "#99f6e4";
+        ctx.fillRect(s.x, yy, s.w, 24);
+      });
+      ctx.fillStyle = "#e8d5b7"; ctx.fillRect(x, 56, prev.w, 24);
+    });
+  }
+
+  function whack(id) {
+    const W = cv.width, H = cv.height;
+    let targets = [], score = 0, t = 0;
+    cv.onpointerdown = (e) => {
+      const p = pointerPos(e);
+      for (let i = targets.length - 1; i >= 0; i--) {
+        const tg = targets[i];
+        if (Math.hypot(tg.x - p.x, tg.y - p.y) < tg.r) {
+          targets.splice(i, 1); score += 10; setScore(score); best("whack", score); beep("win"); return;
+        }
+      }
+    };
+    loop(id, () => {
+      t++;
+      if (t % Math.max(18, (32 / mul()) | 0) === 0) targets.push({ x: rand(40, W - 40), y: rand(40, H - 40), r: 26, life: 90 });
+      targets.forEach((tg) => tg.life--);
+      targets = targets.filter((tg) => tg.life > 0);
+      clear();
+      targets.forEach((tg) => {
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(94,234,212,${Math.max(0.15, tg.life / 90)})`;
+        ctx.arc(tg.x, tg.y, tg.r, 0, Math.PI * 2); ctx.fill();
+      });
+    });
+  }
+
+  function aim(id) {
+    const W = cv.width, H = cv.height;
+    let target = { x: W / 2, y: H / 2, vx: 2.4 * mul(), vy: 1.8 * mul(), r: 24 }, score = 0;
+    cv.onpointerdown = (e) => {
+      const p = pointerPos(e);
+      if (Math.hypot(target.x - p.x, target.y - p.y) < target.r + 6) {
+        score += 15; setScore(score); best("aim", score); beep("win");
+        target.vx *= -1.04; target.vy *= 1.04; target.r = Math.max(12, target.r - 0.5);
+      } else beep("bad");
+    };
+    loop(id, () => {
+      target.x += target.vx; target.y += target.vy;
+      if (target.x < 30 || target.x > W - 30) target.vx *= -1;
+      if (target.y < 30 || target.y > H - 30) target.vy *= -1;
+      clear();
+      ctx.strokeStyle = "#5eead4"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(target.x, target.y, target.r, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = "#e8d5b7"; ctx.beginPath(); ctx.arc(target.x, target.y, 4, 0, Math.PI * 2); ctx.fill();
+    });
+  }
+
+  function memory() {
+    const icons = ["🦆", "🚀", "🎯", "🐍", "⚡", "🧱", "✨", "🏓"];
+    const deck = [...icons, ...icons].sort(() => Math.random() - 0.5).map((v, i) => ({ i, v, on: false, done: false }));
+    let first = null, lock = false, score = 0, matched = 0;
+    const draw = () => {
+      dom.innerHTML = `<div class="mem">${deck.map((c) => `<button type="button" data-i="${c.i}">${c.on || c.done ? c.v : ""}</button>`).join("")}</div>`;
+      dom.querySelectorAll("button").forEach((b) => {
+        b.onclick = () => {
+          const c = deck[+b.dataset.i];
+          if (lock || c.on || c.done) return;
+          c.on = true; draw();
+          if (!first) { first = c; return; }
+          lock = true;
+          if (first.v === c.v) {
+            first.done = c.done = true; matched += 2; score += 20; setScore(score); best("memory", score); beep("win");
+            first = null; lock = false; draw();
+          } else {
+            beep("bad");
+            setTimeout(() => { first.on = false; c.on = false; first = null; lock = false; draw(); }, 500);
+          }
+        };
+      });
+    };
+    draw();
+  }
+
+  function ttt() {
+    const two = playMode === "2p";
+    let board = Array(9).fill(""), over = false, turn = "X", score = scores.ttt || 0;
+    let thinking = false, thinkTimer = 0;
+    setScore(two ? "X " + 0 + " - " + 0 + " O" : score);
+    let sx = 0, so = 0;
+    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+    const winner = () => { for (const [a,b,c] of lines) if (board[a] && board[a] === board[b] && board[b] === board[c]) return board[a]; return null; };
+    const pickBotMove = () => {
+      const empty = board.map((v, i) => v ? -1 : i).filter((i) => i >= 0);
+      if (!empty.length) return;
+      const smartChance = playDiff === "easy" ? 0.3 : playDiff === "hard" ? 0.95 : 0.65;
+      if (Math.random() <= smartChance) {
+        for (const mark of ["O", "X"]) {
+          for (const i of empty) {
+            board[i] = mark;
+            if (winner() === mark) { board[i] = mark === "O" ? "O" : ""; if (mark === "O") return; board[i] = "O"; return; }
+            board[i] = "";
+          }
+        }
+        if (empty.includes(4)) { board[4] = "O"; return; }
+      }
+      board[empty[(Math.random() * empty.length) | 0]] = "O";
+    };
+    const status = () => {
+      const w = winner();
+      if (thinking) return "Bot is thinking…";
+      if (w) return two ? (w + " wins! Restart for rematch") : (w === "X" ? "You win! Restart to play again" : "Bot wins");
+      if (board.every(Boolean)) return "Draw";
+      return two ? ("Turn: " + turn) : "Your turn (X)";
+    };
+    const draw = () => {
+      const w = winner();
+      if (w && !over) {
+        over = true;
+        if (two) {
+          if (w === "X") sx++; else so++;
+          setScore("X " + sx + " - " + so + " O");
+          beep(w === "X" ? "win" : "bad");
+        } else if (w === "X") {
+          score++; setScore(score); best("ttt", score); beep("win");
+        } else beep("bad");
+      }
+      dom.innerHTML = `<div class="ttt">${board.map((v, i) => `<button type="button" data-i="${i}"${thinking || over ? " disabled" : ""}>${v}</button>`).join("")}</div>
+        <p class="hint">${status()}${!two ? " · bot: " + playDiff : ""}</p>`;
+      dom.querySelectorAll("button").forEach((b) => {
+        b.onclick = () => {
+          const i = +b.dataset.i;
+          if (over || thinking || board[i]) return;
+          if (two) {
+            board[i] = turn;
+            turn = turn === "X" ? "O" : "X";
+            beep();
+            draw();
+            return;
+          }
+          board[i] = "X";
+          beep();
+          if (!winner() && board.some((x) => !x)) {
+            thinking = true;
+            const myRun = runId;
+            draw();
+            clearTimeout(thinkTimer);
+            thinkTimer = setTimeout(() => {
+              if (myRun !== runId || !current || current.id !== "ttt") return;
+              pickBotMove();
+              thinking = false;
+              beep();
+              draw();
+            }, botThinkMs());
+            return;
+          }
+          draw();
+        };
+      });
+    };
+    draw();
+  }
+
+  function merge() {
+    let grid = Array.from({ length: 4 }, () => Array(4).fill(0)), score = 0;
+    const add = () => {
+      const empty = [];
+      grid.forEach((row, r) => row.forEach((v, c) => { if (!v) empty.push([r, c]); }));
+      if (!empty.length) return;
+      const [r, c] = empty[(Math.random() * empty.length) | 0];
+      grid[r][c] = Math.random() < 0.9 ? 2 : 4;
+    };
+    const slide = (row) => {
+      const a = row.filter(Boolean);
+      for (let i = 0; i < a.length - 1; i++) if (a[i] === a[i + 1]) { a[i] *= 2; score += a[i]; a.splice(i + 1, 1); }
+      while (a.length < 4) a.push(0);
+      return a;
+    };
+    const rot = () => { grid = grid[0].map((_, c) => grid.map((row) => row[c]).reverse()); };
+    const move = (dir) => {
+      const before = JSON.stringify(grid);
+      const n = { left: 0, up: 1, right: 2, down: 3 }[dir] || 0;
+      for (let i = 0; i < n; i++) rot();
+      grid = grid.map(slide);
+      for (let i = 0; i < (4 - n) % 4; i++) rot();
+      if (JSON.stringify(grid) !== before) { add(); setScore(score); best("merge", score); beep(); draw(); }
+    };
+    const colors = { 0:"#1a1f2a",2:"#1f2a2a",4:"#1d3a36",8:"#134e4a",16:"#0f766e",32:"#5eead4",64:"#99f6e4",128:"#e8d5b7",256:"#fbbf24",512:"#f59e0b",1024:"#f87171",2048:"#fff" };
+    const draw = () => {
+      dom.innerHTML = `<div class="g2048">${grid.flat().map((v) => `<div style="background:${colors[v]||"#5eead4"};color:${v>=32&&v<128?"#04120f":"#f4f4f0"}">${v||""}</div>`).join("")}</div>
+        <p class="hint">Arrows / swipe</p>`;
+    };
+    add(); add(); draw(); setScore(0);
+    window.onkeydown = (e) => {
+      const map = { ArrowLeft: "left", ArrowRight: "right", ArrowUp: "up", ArrowDown: "down", KeyA: "left", KeyD: "right", KeyW: "up", KeyS: "down" };
+      if (map[e.code]) { e.preventDefault(); move(map[e.code]); }
+    };
+    pad.querySelectorAll("button").forEach((b) => {
+      b.onclick = (e) => { e.preventDefault(); if (b.dataset.k !== "action") move(b.dataset.k); };
+    });
+    let sx = 0, sy = 0;
+    dom.ontouchstart = (e) => { sx = e.touches[0].clientX; sy = e.touches[0].clientY; };
+    dom.ontouchend = (e) => {
+      const dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy;
+      if (Math.abs(dx) + Math.abs(dy) < 24) return;
+      move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "right" : "left") : (dy > 0 ? "down" : "up"));
+    };
+  }
+
+  /* -------- UI -------- */
+  $("betaForm").onsubmit = (e) => {
+    e.preventDefault();
+    if (!CODES.includes($("betaCode").value.trim())) {
+      $("betaErr").textContent = "Wrong code. Try again.";
+      return;
+    }
+    sessionStorage.setItem(K.beta, "1");
+    show("device");
+  };
+
+  document.querySelectorAll(".dev").forEach((btn) => {
+    btn.onclick = () => {
+      document.querySelectorAll(".dev").forEach((b) => b.classList.remove("on"));
+      btn.classList.add("on");
+      device = btn.dataset.d;
+    };
+  });
+
+  $("goArcade").onclick = () => {
+    localStorage.setItem(K.device, device);
+    setViewport();
+    renderGrid();
+    show("hub");
+  };
+
+  $("btnSwitch").onclick = () => {
+    stopGame();
+    show("device");
+    document.querySelectorAll(".dev").forEach((b) => b.classList.toggle("on", b.dataset.d === device));
+  };
+
+  $("btnBack").onclick = () => { stopGame(); renderGrid(); show("hub"); };
+  $("btnHome").onclick = goHome;
+  $("btnHomePlay").onclick = goHome;
+  $("btnHomeDevice").onclick = goHome;
+  $("brandHome").onclick = goHome;
+  $("btnRestart").onclick = () => startGame();
+
+  document.querySelectorAll("#diffPick .dev").forEach((b) => {
+    b.onclick = () => {
+      playDiff = b.dataset.diff;
+      document.querySelectorAll("#diffPick .dev").forEach((x) => x.classList.toggle("on", x === b));
+    };
+  });
+  document.querySelectorAll("#modePick .dev").forEach((b) => {
+    b.onclick = () => {
+      playMode = b.dataset.mode;
+      document.querySelectorAll("#modePick .dev").forEach((x) => x.classList.toggle("on", x === b));
+    };
+  });
+  $("launchStart").onclick = beginPending;
+  $("launchCancel").onclick = () => { pending = null; $("launch").classList.remove("on"); };
+  $("launch").onclick = (e) => { if (e.target.id === "launch") { pending = null; $("launch").classList.remove("on"); } };
+
+  function openSettings() {
+    $("togSound").classList.toggle("on", settings.sound);
+    $("togZoom").classList.toggle("on", settings.pcZoom);
+    $("diff").value = settings.difficulty;
+    $("settings").classList.add("on");
+  }
+  $("btnSet1").onclick = openSettings;
+  $("btnSet2").onclick = openSettings;
+  $("closeSet").onclick = () => {
+    settings.difficulty = $("diff").value;
+    playDiff = settings.difficulty;
+    saveSet();
+    $("settings").classList.remove("on");
+    setViewport();
+  };
+  $("settings").onclick = (e) => { if (e.target.id === "settings") { $("settings").classList.remove("on"); setViewport(); } };
+  $("togSound").onclick = () => { settings.sound = !settings.sound; $("togSound").classList.toggle("on", settings.sound); saveSet(); };
+  $("togZoom").onclick = () => { settings.pcZoom = !settings.pcZoom; $("togZoom").classList.toggle("on", settings.pcZoom); saveSet(); setViewport(); };
+  $("diff").onchange = () => { settings.difficulty = $("diff").value; playDiff = settings.difficulty; saveSet(); };
+  $("resetScores").onclick = () => {
+    if (confirm("Reset all high scores?")) { scores = {}; saveScores(); renderGrid(); $("best").textContent = "0"; }
+  };
+
+  // boot
+  sessionStorage.setItem(K.beta, "1"); localStorage.setItem(K.device, "pc"); device = "pc"; if (sessionStorage.getItem(K.beta) === "1") {
+    if (localStorage.getItem(K.device)) {
+      device = localStorage.getItem(K.device);
+      setViewport();
+      renderGrid();
+      show("hub");
+      document.querySelectorAll(".dev").forEach((b) => b.classList.toggle("on", b.dataset.d === device));
+    } else show("device");
+  } else show("beta");
+})();
+</script>
+</body>
+</html>

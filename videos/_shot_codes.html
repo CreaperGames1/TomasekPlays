@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+:root { --bg:#09090b; --ink:#f4f4f0; --muted:rgba(244,244,240,.55); --accent:#5eead4; --line:rgba(244,244,240,.12); --elev:#111114; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:Space Grotesk,system-ui,sans-serif; background:var(--bg); color:var(--ink); min-height:100vh; display:grid; place-items:center;
+  background-image: radial-gradient(ellipse 80% 55% at 70% 15%, rgba(94,234,212,.09), transparent 55%), linear-gradient(180deg,#0c0c10,var(--bg)); }
+.wrap { width:min(900px,92vw); text-align:center; }
+.brand { display:inline-flex; gap:.75rem; align-items:center; font-weight:600; font-size:1.2rem; margin-bottom:1.5rem; }
+.brand img { width:44px; height:44px; border-radius:50%; border:1px solid var(--line); object-fit:cover; }
+.chip { font-family:IBM Plex Mono,monospace; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); margin-bottom:.5rem; }
+h1 { font-size:clamp(2rem,4vw,3rem); letter-spacing:-.04em; margin-bottom:.75rem; }
+p { color:var(--muted); line-height:1.5; margin-bottom:1.5rem; }
+.card { display:inline-block; border:1px solid var(--line); background:linear-gradient(160deg,rgba(94,234,212,.1),transparent 45%), var(--elev);
+  border-radius:18px; padding:2rem 3rem; }
+.card .n { font-family:IBM Plex Mono,monospace; font-size:4.2rem; letter-spacing:.18em; color:var(--accent); font-weight:500; }
+.card .l { margin-top:.6rem; color:var(--muted); font-size:.95rem; }
+</style></head><body>
+<div class="wrap">
+  <div class="brand"><img src="../logo.png" alt="" /> TomasekPlays</div>
+  <div class="chip">Tutorial · Beta code</div>
+  <h1>Use this beta code</h1>
+  <p>Type it in the popup, then press Enter or Try Beta mode.</p>
+  <div class="card"><div class="n">148</div><div class="l">Official beta code</div></div>
+</div>
+</body></html>

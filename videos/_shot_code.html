@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TomasekPlays</title>
+  <meta name="description" content="Tomasek Plays — jump in and play. Instant games, zero setup." />
+  <link rel="icon" href="../logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #09090b;
+      --bg-elevated: #111114;
+      --ink: #f4f4f0;
+      --muted: rgba(244, 244, 240, 0.55);
+      --line: rgba(244, 244, 240, 0.1);
+      --accent: #5eead4;
+      --accent-dim: rgba(94, 234, 212, 0.14);
+      --warm: #e8d5b7;
+      --radius: 12px;
+      --font: "Space Grotesk", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Atmosphere */
+    .atmosphere {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 55% at 70% 15%, rgba(94, 234, 212, 0.09), transparent 55%),
+        radial-gradient(ellipse 60% 45% at 10% 85%, rgba(232, 213, 183, 0.06), transparent 50%),
+        linear-gradient(180deg, #0c0c10 0%, var(--bg) 45%, #08080a 100%);
+    }
+
+    .grid-fade {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.35;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 10%, transparent 70%);
+      animation: gridDrift 28s linear infinite;
+    }
+
+    @keyframes gridDrift {
+      from { background-position: 0 0, 0 0; }
+      to { background-position: 0 64px, 64px 0; }
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(1120px, calc(100% - 2.5rem));
+      margin-inline: auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 0;
+      flex-shrink: 0;
+      animation: rise 0.7s ease both;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      font-size: 1.25rem;
+    }
+
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 1px solid var(--line);
+      display: block;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .brand .yt-logo:hover img {
+      transform: scale(1.06);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      font-size: 1.05rem;
+      color: var(--muted);
+    }
+
+    .nav-links a:hover { color: var(--ink); }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.2rem;
+      border-radius: 999px;
+      background: var(--ink);
+      color: var(--bg);
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .nav-cta:hover { transform: translateY(-1px); opacity: 0.92; }
+
+    button.btn-play {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    /* Hero — one composition, one screen */
+    .hero {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 1.05fr;
+      gap: 2rem;
+      align-items: center;
+      padding: 0.5rem 0 0.75rem;
+    }
+
+    .hero-copy {
+      animation: rise 0.85s 0.08s ease both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.85rem;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--accent-dim);
+      animation: pulseDot 2.2s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(0.85); opacity: 0.7; }
+    }
+
+    .brand-hero {
+      font-size: clamp(2.4rem, 5.5vw, 4rem);
+      font-weight: 700;
+      letter-spacing: -0.055em;
+      line-height: 0.95;
+      margin-bottom: 0.85rem;
+    }
+
+    .brand-hero span {
+      display: block;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: -0.04em;
+    }
+
+    .lede {
+      max-width: 28rem;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .cta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .btn-play {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.9rem 1.35rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #04120f;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 0 0 0 rgba(94, 234, 212, 0.35);
+      animation: ctaGlow 3s ease-in-out infinite;
+    }
+
+    .cta-row .btn-play {
+      padding: 1.1rem 1.7rem;
+      font-size: 1.1rem;
+      gap: 0.75rem;
+    }
+
+    .cta-row .btn-play svg { width: 18px; height: 18px; }
+
+    .btn-play:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 40px rgba(94, 234, 212, 0.25);
+    }
+
+    .btn-play svg { width: 16px; height: 16px; }
+
+    @keyframes ctaGlow {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(94, 234, 212, 0.25); }
+      50% { box-shadow: 0 0 0 8px rgba(94, 234, 212, 0); }
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.9rem 1.15rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--muted);
+      font-size: 0.9rem;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-ghost:hover {
+      color: var(--ink);
+      border-color: rgba(244, 244, 240, 0.25);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn-cancel {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.9rem 1.15rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .btn-cancel:hover {
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-link-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font: inherit;
+      font-size: inherit;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .nav-link-btn:hover { color: var(--ink); }
+
+    /* Visual stage */
+    .hero-stage {
+      position: relative;
+      animation: rise 1s 0.18s ease both;
+      isolation: isolate;
+      min-height: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .hero-stage .stage-frame { width: 100%; }
+
+    .stage-frame {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: var(--bg-elevated);
+      height: min(52vh, 420px);
+      max-height: 100%;
+      aspect-ratio: auto;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+        0 40px 80px rgba(0, 0, 0, 0.45);
+    }
+
+    .stage-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(145deg, rgba(94, 234, 212, 0.12), transparent 40%),
+        linear-gradient(320deg, rgba(232, 213, 183, 0.1), transparent 35%),
+        radial-gradient(circle at 60% 40%, #1a1a22 0%, #0b0b0f 70%);
+    }
+
+    .stage-scan {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0, 0, 0, 0.08) 3px,
+        rgba(0, 0, 0, 0.08) 4px
+      );
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .logo-orb {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: min(58%, 240px);
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid rgba(94, 234, 212, 0.35);
+      box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(94, 234, 212, 0.2);
+      animation: floatLogo 5.5s ease-in-out infinite;
+    }
+
+    .logo-orb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    @keyframes floatLogo {
+      0%, 100% { transform: translate(-50%, -50%); }
+      50% { transform: translate(-50%, calc(-50% - 10px)); }
+    }
+
+    .hud {
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.75rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .hud-chip {
+      padding: 0.45rem 0.7rem;
+      border-radius: 8px;
+      background: rgba(9, 9, 11, 0.65);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+
+    .hud-chip strong {
+      color: var(--accent);
+      font-weight: 500;
+    }
+
+    .orbit {
+      position: absolute;
+      inset: 8%;
+      border: 1px dashed rgba(244, 244, 240, 0.08);
+      border-radius: 50%;
+      animation: spin 40s linear infinite;
+      pointer-events: none;
+    }
+
+    .orbit::after {
+      content: "";
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      width: 8px;
+      height: 8px;
+      margin-left: -4px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 16px var(--accent);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .contact-email {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.35);
+      margin-bottom: 1rem;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+
+    .copy-status {
+      min-height: 1.2rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.85rem;
+      color: var(--accent);
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 860px) {
+      html, body { overflow: auto; height: auto; min-height: 100%; }
+
+      .wrap { height: auto; min-height: 100dvh; }
+
+      .hero {
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+        padding: 0.75rem 0;
+      }
+
+      .brand-hero { font-size: clamp(2.2rem, 10vw, 3rem); }
+
+      .stage-frame { height: min(38vh, 280px); width: 100%; }
+    }
+
+    /* Beta gate */
+    .beta-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: rgba(5, 5, 8, 0.72);
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: opacity 0.35s ease, visibility 0.35s ease;
+    }
+
+    .beta-overlay.open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .beta-modal {
+      width: min(420px, 100%);
+      padding: 1.75rem;
+      border-radius: 16px;
+      border: 1px solid var(--line);
+      background: linear-gradient(160deg, rgba(94, 234, 212, 0.08), transparent 42%), var(--bg-elevated);
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+      transform: translateY(18px) scale(0.94);
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .beta-overlay.open .beta-modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .beta-modal.shake {
+      animation: modalShake 0.45s ease;
+    }
+
+    .beta-modal.unlock {
+      animation: modalUnlock 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+      border-color: rgba(94, 234, 212, 0.65);
+      box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.25), 0 30px 80px rgba(94, 234, 212, 0.2);
+    }
+
+    @keyframes modalShake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-6px); }
+      80% { transform: translateX(4px); }
+    }
+
+    @keyframes modalUnlock {
+      0% { transform: scale(1); }
+      35% { transform: scale(1.04); }
+      70% { transform: scale(0.98); opacity: 1; }
+      100% { transform: scale(1.08); opacity: 0; }
+    }
+
+    .beta-overlay.closing {
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .beta-modal h2 {
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.4rem;
+    }
+
+    .beta-modal > p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .beta-fields {
+      display: grid;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .beta-fields label {
+      display: grid;
+      gap: 0.35rem;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .beta-fields input {
+      width: 100%;
+      padding: 0.75rem 0.85rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--ink);
+      font-family: var(--mono);
+      font-size: 1rem;
+      letter-spacing: 0.12em;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    }
+
+    .beta-fields input:focus {
+      border-color: rgba(94, 234, 212, 0.55);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .beta-fields input.ok {
+      border-color: rgba(94, 234, 212, 0.8);
+      background: rgba(94, 234, 212, 0.12);
+      box-shadow: 0 0 0 4px var(--accent-dim);
+      animation: codePulse 0.7s ease;
+    }
+
+    @keyframes codePulse {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.03); }
+      100% { transform: scale(1); }
+    }
+
+    .beta-error {
+      min-height: 1.2rem;
+      margin-bottom: 0.85rem;
+      font-size: 0.85rem;
+      color: #f87171;
+    }
+
+    .beta-error.ok-msg {
+      color: var(--accent);
+    }
+
+    .beta-actions {
+      display: flex;
+      gap: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .beta-actions .btn-play,
+    .beta-actions .btn-cancel {
+      flex: 1;
+      justify-content: center;
+      min-width: 120px;
+    }
+
+    /* Fullscreen unlock flash after correct code */
+    .unlock-flash {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(circle at 50% 45%, rgba(94, 234, 212, 0.35), transparent 55%),
+        rgba(9, 9, 11, 0.55);
+    }
+
+    .unlock-flash.go {
+      animation: unlockFlash 0.9s ease forwards;
+    }
+
+    @keyframes unlockFlash {
+      0% { opacity: 0; transform: scale(1.05); }
+      35% { opacity: 1; transform: scale(1); }
+      100% { opacity: 0; transform: scale(0.98); }
+    }
+
+    .unlock-badge {
+      position: fixed;
+      left: 50%;
+      top: 46%;
+      z-index: 121;
+      transform: translate(-50%, -40%) scale(0.8);
+      opacity: 0;
+      pointer-events: none;
+      font-family: var(--mono);
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0.85rem 1.25rem;
+      border-radius: 999px;
+      border: 1px solid rgba(94, 234, 212, 0.45);
+      background: rgba(9, 9, 11, 0.85);
+      box-shadow: 0 0 40px rgba(94, 234, 212, 0.25);
+    }
+
+    .unlock-badge.go {
+      animation: unlockBadge 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes unlockBadge {
+      0% { opacity: 0; transform: translate(-50%, -40%) scale(0.8); }
+      40% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+      100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
+    }
+  </style>
+
+<style id="shotFix">
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .hero-copy, .hero-stage, .nav, .brand-hero, .lede, .btn-play, .cta-row { opacity: 1 !important; transform: none !important; }
+  html, body { overflow: hidden !important; height: 100% !important; }
+</style>
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+  <div class="grid-fade" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="nav">
+      <div class="brand">
+        <a class="yt-logo" href="https://www.youtube.com/@TomasekPlays" target="_blank" rel="noopener noreferrer" title="TomasekPlays on YouTube">
+          <img src="../logo.png" alt="TomasekPlays YouTube" width="44" height="44" />
+        </a>
+        <a href="index.html">TomasekPlays</a>
+      </div>
+      <nav class="nav-links" aria-label="Primary">
+        <button type="button" class="nav-link-btn" onclick="openContact()">Contact</button>
+        <button type="button" class="nav-cta" onclick="openBetaGate()">Try Beta mode</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-labelledby="brand-title">
+        <div class="hero-copy">
+          <p class="eyebrow">Beta access</p>
+          <h1 class="brand-hero" id="brand-title">
+            Tomasek
+            <span>Plays</span>
+          </h1>
+          <p class="lede">
+            A clean drop-in arcade. Enter a beta code to unlock play — no installs, no clutter.
+          </p>
+          <div class="cta-row">
+            <button type="button" class="btn-play" onclick="openBetaGate()">
+              <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M3.5 2.8v10.4L13 8 3.5 2.8z" />
+              </svg>
+              Try Beta mode
+            </button>
+          </div>
+        </div>
+
+        <div class="hero-stage" aria-hidden="true">
+          <div class="stage-frame">
+            <div class="stage-bg"></div>
+            <div class="orbit"></div>
+            <div class="logo-orb">
+              <img src="../logo.png" alt="" />
+            </div>
+            <div class="stage-scan"></div>
+            <div class="hud">
+              <span class="hud-chip">status <strong>ready</strong></span>
+              <span class="hud-chip">session <strong>online</strong></span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="beta-overlay open" id="betaGate" role="dialog" aria-modal="true" aria-labelledby="betaTitle">
+    <div class="beta-modal" id="betaModal">
+      <h2 id="betaTitle">Try Beta mode</h2>
+      <p>Enter a beta code to unlock the games.</p>
+      <form class="beta-fields" id="betaForm" autocomplete="off" onsubmit="return submitBeta(event)">
+        <label>
+          Beta code
+          <input id="betaCode" name="code" inputmode="numeric" maxlength="8" placeholder="Enter code" required value="148" />
+        </label>
+        <p class="beta-error" id="betaError" aria-live="polite"></p>
+        <div class="beta-actions">
+          <button type="button" class="btn-cancel" onclick="closeBetaGate()">Cancel</button>
+          <button type="submit" class="btn-play" id="betaSubmit">Try Beta mode</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="unlock-flash" id="unlockFlash" aria-hidden="true"></div>
+  <div class="unlock-badge" id="unlockBadge" aria-hidden="true">Access unlocked</div>
+
+  <div class="beta-overlay" id="contactGate" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
+    <div class="beta-modal">
+      <h2 id="contactTitle">Contact</h2>
+      <p>Business inquiries, collabs, or feedback.</p>
+      <div class="contact-email" id="contactEmail">tomasekplays.business@outlook.com</div>
+      <p class="copy-status" id="copyStatus" aria-live="polite"></p>
+      <div class="beta-actions">
+        <button type="button" class="btn-cancel" onclick="closeContact()">Close</button>
+        <button type="button" class="btn-play" id="copyBtn" onclick="copyContactEmail()">Copy to clipboard</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const BETA_CODES = ["4949", "148", "312"];
+    const BETA_KEY = "tomasekBetaUnlocked";
+    const CONTACT_EMAIL = "tomasekplays.business@outlook.com";
+    let betaBusy = false;
+
+    function openBetaGate() {
+      if (betaBusy) return;
+      if (sessionStorage.getItem(BETA_KEY) === "1") {
+        playUnlockThenGo();
+        return;
+      }
+      closeContact();
+      const gate = document.getElementById("betaGate");
+      const modal = document.getElementById("betaModal");
+      const err = document.getElementById("betaError");
+      const input = document.getElementById("betaCode");
+      err.textContent = "";
+      err.classList.remove("ok-msg");
+      input.classList.remove("ok");
+      input.value = "";
+      modal.classList.remove("shake", "unlock");
+      gate.classList.remove("closing");
+      gate.classList.add("open");
+      setTimeout(() => input.focus(), 280);
+    }
+
+    function closeBetaGate() {
+      if (betaBusy) return;
+      const gate = document.getElementById("betaGate");
+      gate.classList.remove("open");
+    }
+
+    function openContact() {
+      if (betaBusy) return;
+      closeBetaGate();
+      document.getElementById("copyStatus").textContent = "";
+      document.getElementById("contactGate").classList.add("open");
+    }
+
+    function closeContact() {
+      document.getElementById("contactGate").classList.remove("open");
+    }
+
+    async function copyContactEmail() {
+      const status = document.getElementById("copyStatus");
+      try {
+        await navigator.clipboard.writeText(CONTACT_EMAIL);
+        status.textContent = "Copied!";
+      } catch (_) {
+        const range = document.createRange();
+        range.selectNodeContents(document.getElementById("contactEmail"));
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        status.textContent = "Select and copy the email above.";
+      }
+    }
+
+    function playUnlockThenGo() {
+      betaBusy = true;
+      const gate = document.getElementById("betaGate");
+      const modal = document.getElementById("betaModal");
+      const flash = document.getElementById("unlockFlash");
+      const badge = document.getElementById("unlockBadge");
+      const err = document.getElementById("betaError");
+      const input = document.getElementById("betaCode");
+
+      err.textContent = "Code accepted — unlocking…";
+      err.classList.add("ok-msg");
+      input.classList.add("ok");
+      input.blur();
+      document.getElementById("betaSubmit").disabled = true;
+
+      modal.classList.remove("shake");
+      modal.classList.add("unlock");
+      gate.classList.add("closing");
+      flash.classList.add("go");
+      badge.classList.add("go");
+
+      setTimeout(() => {
+        window.location.href = "../games.html";
+      }, 900);
+    }
+
+    function submitBeta(event) {
+      event.preventDefault();
+      if (betaBusy) return false;
+
+      const modal = document.getElementById("betaModal");
+      const err = document.getElementById("betaError");
+      const entered = document.getElementById("betaCode").value.trim();
+
+      if (!BETA_CODES.includes(entered)) {
+        err.textContent = "Wrong code. Try again.";
+        err.classList.remove("ok-msg");
+        modal.classList.remove("shake");
+        void modal.offsetWidth;
+        modal.classList.add("shake");
+        return false;
+      }
+
+      sessionStorage.setItem(BETA_KEY, "1");
+      playUnlockThenGo();
+      return false;
+    }
+
+    document.getElementById("betaGate").addEventListener("click", (e) => {
+      if (e.target.id === "betaGate") closeBetaGate();
+    });
+
+    document.getElementById("contactGate").addEventListener("click", (e) => {
+      if (e.target.id === "contactGate") closeContact();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !betaBusy) {
+        closeBetaGate();
+        closeContact();
+      }
+    });
+  </script>
+</body>
+</html>
