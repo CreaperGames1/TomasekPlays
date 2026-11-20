@@ -67,6 +67,7 @@
     }
     input:focus, select:focus { border-color: rgba(94,234,212,.5); box-shadow: 0 0 0 3px var(--accent-dim); }
     .err { color: #f87171; min-height: 1.1rem; font-size: .85rem; margin-bottom: .5rem; }
+    .err.ok { color: var(--accent); }
 
     .btn {
       display: inline-flex; align-items: center; justify-content: center; gap: .4rem;
@@ -373,6 +374,21 @@
       <div class="pad one" id="pad"></div>
     </div>
   </section>
+
+  <div class="overlay" id="redeem">
+    <div class="card" style="width:min(440px,100%)">
+      <h1>Redeem</h1>
+      <p>Enter a code.</p>
+      <form id="redeemForm">
+        <label class="f">Code <input id="redeemCode" maxlength="32" placeholder="Enter code" autocomplete="off" required /></label>
+        <p class="err" id="redeemErr"></p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+          <button type="button" class="btn btn-g" id="redeemCancel" style="flex:1">Cancel</button>
+          <button type="submit" class="btn btn-a" id="redeemSubmit" style="flex:1;width:auto">Redeem</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <div class="overlay" id="settings">
     <div class="card" style="width:min(440px,100%)">
@@ -1348,8 +1364,65 @@
   $("btnHome").onclick = goHome;
   $("btnHomePlay").onclick = goHome;
   $("btnHomeDevice").onclick = goHome;
-  $("brandHome").onclick = goHome;
   $("btnRestart").onclick = () => startGame();
+
+  const REDEEM_CODES = {
+    ONE4EXES: {
+      type: "download",
+      href: "downloads/TomasekPlays.exe",
+      filename: "TomasekPlays.exe",
+      ok: "Downloading TomasekPlays.exe…"
+    }
+  };
+
+  function normalizeRedeemCode(raw) {
+    return String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  }
+
+  function openRedeem() {
+    $("redeemErr").textContent = "";
+    $("redeemErr").classList.remove("ok");
+    $("redeemCode").value = "";
+    $("redeemSubmit").disabled = false;
+    $("redeem").classList.add("on");
+    setTimeout(() => $("redeemCode").focus(), 80);
+  }
+
+  function closeRedeem() {
+    $("redeem").classList.remove("on");
+  }
+
+  $("brandHome").onclick = (e) => {
+    e.preventDefault();
+    openRedeem();
+  };
+  $("redeemCancel").onclick = closeRedeem;
+  $("redeem").onclick = (e) => { if (e.target.id === "redeem") closeRedeem(); };
+  $("redeemForm").onsubmit = (e) => {
+    e.preventDefault();
+    const entered = normalizeRedeemCode($("redeemCode").value);
+    const reward = REDEEM_CODES[entered];
+    const err = $("redeemErr");
+    if (!reward) {
+      err.classList.remove("ok");
+      err.textContent = "Wrong code. Try again.";
+      return false;
+    }
+    if (reward.type === "download") {
+      err.classList.add("ok");
+      err.textContent = reward.ok;
+      $("redeemSubmit").disabled = true;
+      const a = document.createElement("a");
+      a.href = reward.href;
+      a.download = reward.filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(closeRedeem, 1200);
+    }
+    return false;
+  };
 
   document.querySelectorAll("#diffPick .dev").forEach((b) => {
     b.onclick = () => {

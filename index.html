@@ -814,7 +814,7 @@
         <a class="yt-logo" href="https://www.youtube.com/@TomasekPlays" target="_blank" rel="noopener noreferrer" title="TomasekPlays on YouTube">
           <img src="logo.png" alt="TomasekPlays YouTube" width="44" height="44" />
         </a>
-        <a href="index.html">TomasekPlays</a>
+        <a href="index.html" id="brandTitle">TomasekPlays</a>
       </div>
       <nav class="nav-links" aria-label="Primary">
         <span class="device-pill" id="devicePill">Phone</span>
@@ -896,10 +896,36 @@
     </div>
   </div>
 
+  <div class="beta-overlay" id="redeemGate" role="dialog" aria-modal="true" aria-labelledby="redeemTitle">
+    <div class="beta-modal" id="redeemModal">
+      <h2 id="redeemTitle">Redeem</h2>
+      <p>Enter a code.</p>
+      <form class="beta-fields" id="redeemForm" autocomplete="off" onsubmit="return submitRedeem(event)">
+        <label>
+          Code
+          <input id="redeemCode" name="code" maxlength="32" placeholder="Enter code" required />
+        </label>
+        <p class="beta-error" id="redeemError" aria-live="polite"></p>
+        <div class="beta-actions">
+          <button type="button" class="btn-cancel" onclick="closeRedeemGate()">Cancel</button>
+          <button type="submit" class="btn-play" id="redeemSubmit">Redeem</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
     const BETA_CODES = ["4949", "148", "312"];
     const BETA_KEY = "tomasekBetaUnlocked";
     const CONTACT_EMAIL = "tomasekplays.business@outlook.com";
+    const REDEEM_CODES = {
+      ONE4EXES: {
+        type: "download",
+        href: "downloads/TomasekPlays.exe",
+        filename: "TomasekPlays.exe",
+        ok: "Downloading TomasekPlays.exe…"
+      }
+    };
     let betaBusy = false;
 
     function detectDevice() {
@@ -927,6 +953,10 @@
     window.addEventListener("resize", () => { applyDevice(); });
     window.addEventListener("orientationchange", () => { applyDevice(); });
 
+    function normalizeRedeemCode(raw) {
+      return String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+    }
+
     function openBetaGate() {
       if (betaBusy) return;
       if (sessionStorage.getItem(BETA_KEY) === "1") {
@@ -934,6 +964,7 @@
         return;
       }
       closeContact();
+      closeRedeemGate();
       const gate = document.getElementById("betaGate");
       const modal = document.getElementById("betaModal");
       const err = document.getElementById("betaError");
@@ -954,9 +985,77 @@
       gate.classList.remove("open");
     }
 
+    function openRedeemGate() {
+      if (betaBusy) return;
+      closeBetaGate();
+      closeContact();
+      const gate = document.getElementById("redeemGate");
+      const modal = document.getElementById("redeemModal");
+      const err = document.getElementById("redeemError");
+      const input = document.getElementById("redeemCode");
+      err.textContent = "";
+      err.classList.remove("ok-msg");
+      input.classList.remove("ok");
+      input.value = "";
+      modal.classList.remove("shake", "unlock");
+      document.getElementById("redeemSubmit").disabled = false;
+      gate.classList.add("open");
+      setTimeout(() => input.focus(), 280);
+    }
+
+    function closeRedeemGate() {
+      document.getElementById("redeemGate").classList.remove("open");
+    }
+
+    function runRedeemDownload(reward) {
+      const err = document.getElementById("redeemError");
+      const input = document.getElementById("redeemCode");
+      const modal = document.getElementById("redeemModal");
+      err.textContent = reward.ok;
+      err.classList.add("ok-msg");
+      input.classList.add("ok");
+      modal.classList.add("unlock");
+      document.getElementById("redeemSubmit").disabled = true;
+
+      const a = document.createElement("a");
+      a.href = reward.href;
+      a.download = reward.filename;
+      a.rel = "noopener";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      setTimeout(() => closeRedeemGate(), 1200);
+    }
+
+    function submitRedeem(event) {
+      event.preventDefault();
+      if (betaBusy) return false;
+
+      const modal = document.getElementById("redeemModal");
+      const err = document.getElementById("redeemError");
+      const entered = normalizeRedeemCode(document.getElementById("redeemCode").value);
+      const reward = REDEEM_CODES[entered];
+
+      if (!reward) {
+        err.textContent = "Wrong code. Try again.";
+        err.classList.remove("ok-msg");
+        modal.classList.remove("shake");
+        void modal.offsetWidth;
+        modal.classList.add("shake");
+        return false;
+      }
+
+      if (reward.type === "download") {
+        runRedeemDownload(reward);
+      }
+      return false;
+    }
+
     function openContact() {
       if (betaBusy) return;
       closeBetaGate();
+      closeRedeemGate();
       document.getElementById("copyStatus").textContent = "";
       document.getElementById("contactGate").classList.add("open");
     }
@@ -1028,6 +1127,11 @@
       return false;
     }
 
+    document.getElementById("brandTitle").addEventListener("click", (e) => {
+      e.preventDefault();
+      openRedeemGate();
+    });
+
     document.getElementById("betaGate").addEventListener("click", (e) => {
       if (e.target.id === "betaGate") closeBetaGate();
     });
@@ -1036,10 +1140,15 @@
       if (e.target.id === "contactGate") closeContact();
     });
 
+    document.getElementById("redeemGate").addEventListener("click", (e) => {
+      if (e.target.id === "redeemGate") closeRedeemGate();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !betaBusy) {
         closeBetaGate();
         closeContact();
+        closeRedeemGate();
       }
     });
   </script>
