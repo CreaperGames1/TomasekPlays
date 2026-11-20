@@ -185,6 +185,47 @@
       .grid { grid-template-columns: repeat(2, 1fr); }
     }
 
+    /* Phone-special layout (auto-detected) */
+    body.is-mobile {
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+    body.is-mobile .wrap { width: min(100% - 1rem, 1100px); }
+    body.is-mobile .nav { padding: .85rem 0; gap: .5rem; }
+    body.is-mobile .brand { font-size: .95rem; }
+    body.is-mobile .head h2 { font-size: 1.45rem; }
+    body.is-mobile .head p { font-size: .88rem; }
+    body.is-mobile .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .65rem;
+      padding-bottom: 5rem;
+    }
+    body.is-mobile .gcard {
+      min-height: 128px;
+      padding: .85rem;
+      border-radius: 12px;
+    }
+    body.is-mobile .gcard .e { font-size: 1.25rem; }
+    body.is-mobile .gcard h3 { font-size: .9rem; }
+    body.is-mobile .gcard p { font-size: .7rem; }
+    body.is-mobile .pbar {
+      padding: .65rem .75rem;
+      gap: .5rem;
+      position: sticky;
+      top: 0;
+    }
+    body.is-mobile .stage { padding: .65rem; gap: .55rem; }
+    body.is-mobile .canvas-wrap,
+    body.is-mobile #dom { width: min(100%, 100%); border-radius: 12px; }
+    body.is-mobile #dom { min-height: 320px; padding: .75rem; }
+    body.is-mobile .pad { width: 100%; }
+    body.is-mobile .pad button { min-height: 58px; font-size: 1.15rem; border-radius: 14px; }
+    body.is-mobile .card { padding: 1.25rem; border-radius: 18px; }
+    body.is-mobile .btn { min-height: 48px; }
+    body.is-mobile .btn-home { min-height: 40px; }
+    body.is-mobile .nav-r { gap: .35rem; }
+    body.is-mobile .chip { font-size: .62rem; padding: .35rem .5rem; }
+    body.is-mobile #btnSwitch { display: none; }
+
     .btn-home {
       display: inline-flex; align-items: center; gap: .35rem;
       padding: .5rem .9rem; font-size: .82rem; border-radius: 999px;
@@ -276,7 +317,7 @@
     <div class="gate">
       <div class="card">
         <h1>Choose your setup</h1>
-        <p>Mobile turns zoom off. PC can keep zoom on.</p>
+        <p>Auto-detects phone or PC. You can override here anytime.</p>
         <div class="devs">
           <button type="button" class="dev on" data-d="pc"><strong>PC</strong><span>Keyboard · zoom ok</span></button>
           <button type="button" class="dev" data-d="mobile"><strong>Mobile</strong><span>Touch · zoom off</span></button>
@@ -395,7 +436,19 @@
   const dom = document.getElementById("dom");
   const pad = document.getElementById("pad");
 
-  let device = localStorage.getItem(K.device) || "pc";
+  function detectDevice() {
+    const ua = navigator.userAgent || "";
+    const mobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+    const iPad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const narrow = window.matchMedia("(max-width: 820px)").matches;
+    const touch = navigator.maxTouchPoints > 0 || "ontouchstart" in window;
+    if (mobileUA && !iPad) return "mobile";
+    if (touch && narrow && !iPad) return "mobile";
+    return "pc";
+  }
+
+  let device = detectDevice();
+  try { localStorage.setItem(K.device, device); } catch (_) {}
   let settings = Object.assign({ sound: true, difficulty: "normal", pcZoom: true, mode: "bot" }, JSON.parse(localStorage.getItem(K.set) || "{}"));
   let scores = JSON.parse(localStorage.getItem(K.scores) || "{}");
   let current = null;
@@ -495,7 +548,11 @@
   }
 
   function sizeCanvas(wide) {
-    if (wide) { cv.width = 480; cv.height = 360; }
+    if (device === "mobile") {
+      // Phone-friendly canvas size
+      if (wide) { cv.width = 390; cv.height = 280; }
+      else { cv.width = 320; cv.height = 460; }
+    } else if (wide) { cv.width = 480; cv.height = 360; }
     else { cv.width = 360; cv.height = 480; }
   }
 
@@ -1246,6 +1303,15 @@
   }
 
   /* -------- UI -------- */
+  function enterArcade() {
+    device = detectDevice();
+    localStorage.setItem(K.device, device);
+    setViewport();
+    renderGrid();
+    show("hub");
+    document.querySelectorAll("#device .dev").forEach((b) => b.classList.toggle("on", b.dataset.d === device));
+  }
+
   $("betaForm").onsubmit = (e) => {
     e.preventDefault();
     if (!CODES.includes($("betaCode").value.trim())) {
@@ -1253,12 +1319,13 @@
       return;
     }
     sessionStorage.setItem(K.beta, "1");
-    show("device");
+    // Auto-detect phone/PC — skip manual picker
+    enterArcade();
   };
 
-  document.querySelectorAll(".dev").forEach((btn) => {
+  document.querySelectorAll("#device .dev").forEach((btn) => {
     btn.onclick = () => {
-      document.querySelectorAll(".dev").forEach((b) => b.classList.remove("on"));
+      document.querySelectorAll("#device .dev").forEach((b) => b.classList.remove("on"));
       btn.classList.add("on");
       device = btn.dataset.d;
     };
@@ -1323,16 +1390,30 @@
     if (confirm("Reset all high scores?")) { scores = {}; saveScores(); renderGrid(); $("best").textContent = "0"; }
   };
 
-  // boot
+  // boot — always re-detect phone vs PC
+  device = detectDevice();
+  try { localStorage.setItem(K.device, device); } catch (_) {}
+  document.querySelectorAll("#device .dev").forEach((b) => b.classList.toggle("on", b.dataset.d === device));
+
   if (sessionStorage.getItem(K.beta) === "1") {
-    if (localStorage.getItem(K.device)) {
-      device = localStorage.getItem(K.device);
-      setViewport();
-      renderGrid();
-      show("hub");
-      document.querySelectorAll(".dev").forEach((b) => b.classList.toggle("on", b.dataset.d === device));
-    } else show("device");
+    setViewport();
+    renderGrid();
+    show("hub");
   } else show("beta");
+
+  window.addEventListener("resize", () => {
+    const next = detectDevice();
+    if (next !== device && !$("player").classList.contains("on")) {
+      device = next;
+      try { localStorage.setItem(K.device, device); } catch (_) {}
+      setViewport();
+    }
+  });
+  window.addEventListener("orientationchange", () => {
+    device = detectDevice();
+    try { localStorage.setItem(K.device, device); } catch (_) {}
+    setViewport();
+  });
 })();
 </script>
 </body>

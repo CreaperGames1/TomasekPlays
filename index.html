@@ -477,20 +477,123 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
+    /* Phone layout — specially tuned for small screens */
+    body.is-phone {
+      overflow: auto;
+      height: auto;
+      min-height: 100%;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    body.is-phone .wrap {
+      width: min(100% - 1.25rem, 560px);
+      height: auto;
+      min-height: 100dvh;
+    }
+
+    body.is-phone .nav {
+      padding: 0.85rem 0;
+      gap: 0.5rem;
+    }
+
+    body.is-phone .brand { font-size: 1.05rem; gap: 0.55rem; }
+    body.is-phone .brand img { width: 36px; height: 36px; }
+    body.is-phone .nav-links { gap: 0.65rem; font-size: 0.9rem; }
+    body.is-phone .nav-cta { padding: 0.55rem 0.85rem; font-size: 0.82rem; }
+
+    body.is-phone .hero {
+      grid-template-columns: 1fr;
+      grid-template-areas: "stage" "copy";
+      gap: 1rem;
+      padding: 0.35rem 0 1.25rem;
+      align-items: start;
+    }
+
+    body.is-phone .hero-stage { grid-area: stage; order: -1; }
+    body.is-phone .hero-copy { grid-area: copy; text-align: center; }
+
+    body.is-phone .eyebrow { justify-content: center; margin-bottom: 0.55rem; font-size: 0.68rem; }
+    body.is-phone .brand-hero { font-size: clamp(2.35rem, 11vw, 3.1rem); margin-bottom: 0.55rem; }
+    body.is-phone .lede {
+      margin-inline: auto;
+      font-size: 0.95rem;
+      margin-bottom: 1.1rem;
+      max-width: 22rem;
+    }
+
+    body.is-phone .cta-row { justify-content: center; width: 100%; }
+    body.is-phone .cta-row .btn-play {
+      width: 100%;
+      justify-content: center;
+      padding: 1.05rem 1.25rem;
+      font-size: 1.05rem;
+      min-height: 52px;
+    }
+
+    body.is-phone .stage-frame {
+      height: min(34vh, 240px);
+      width: 100%;
+      border-radius: 14px;
+    }
+
+    body.is-phone .logo-orb { width: min(46%, 140px); }
+    body.is-phone .hud { font-size: 0.58rem; left: 0.65rem; right: 0.65rem; bottom: 0.65rem; }
+    body.is-phone .hud-chip { padding: 0.35rem 0.5rem; }
+
+    body.is-phone .beta-modal {
+      width: min(100%, 420px);
+      padding: 1.35rem;
+      border-radius: 18px;
+    }
+
+    body.is-phone .beta-fields input {
+      font-size: 1.15rem;
+      padding: 0.9rem 1rem;
+      min-height: 52px;
+    }
+
+    body.is-phone .beta-actions .btn-play,
+    body.is-phone .beta-actions .btn-cancel {
+      min-height: 48px;
+      font-size: 0.95rem;
+    }
+
+    body.is-phone .device-pill {
+      display: inline-flex;
+    }
+
+    .device-pill {
+      display: none;
+      align-items: center;
+      gap: 0.35rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid rgba(94, 234, 212, 0.3);
+      background: var(--accent-dim);
+      border-radius: 999px;
+      padding: 0.3rem 0.55rem;
+    }
+
+    /* Narrow PC window still stacks, but keeps PC styling */
     @media (max-width: 860px) {
-      html, body { overflow: auto; height: auto; min-height: 100%; }
-
-      .wrap { height: auto; min-height: 100dvh; }
-
-      .hero {
+      body.is-pc {
+        overflow: auto;
+        height: auto;
+        min-height: 100%;
+        min-height: 100dvh;
+      }
+      body.is-pc .wrap { height: auto; min-height: 100dvh; }
+      body.is-pc .hero {
         grid-template-columns: 1fr;
         gap: 1.25rem;
         padding: 0.75rem 0;
       }
-
-      .brand-hero { font-size: clamp(2.2rem, 10vw, 3rem); }
-
-      .stage-frame { height: min(38vh, 280px); width: 100%; }
+      body.is-pc .brand-hero { font-size: clamp(2.2rem, 10vw, 3rem); }
+      body.is-pc .stage-frame { height: min(38vh, 280px); width: 100%; }
     }
 
     /* Beta gate */
@@ -714,6 +817,7 @@
         <a href="index.html">TomasekPlays</a>
       </div>
       <nav class="nav-links" aria-label="Primary">
+        <span class="device-pill" id="devicePill">Phone</span>
         <button type="button" class="nav-link-btn" onclick="openContact()">Contact</button>
         <button type="button" class="nav-cta" onclick="openBetaGate()">Try Beta mode</button>
       </nav>
@@ -797,6 +901,31 @@
     const BETA_KEY = "tomasekBetaUnlocked";
     const CONTACT_EMAIL = "tomasekplays.business@outlook.com";
     let betaBusy = false;
+
+    function detectDevice() {
+      const ua = navigator.userAgent || "";
+      const mobileUA = /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(ua);
+      const iPad = /iPad/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const narrow = window.matchMedia("(max-width: 820px)").matches;
+      const touch = navigator.maxTouchPoints > 0 || "ontouchstart" in window;
+      // Phones (and phone-like narrow touch devices) get the special mobile layout
+      if (mobileUA && !iPad) return "phone";
+      if (touch && narrow && !iPad) return "phone";
+      return "pc";
+    }
+
+    function applyDevice() {
+      const kind = detectDevice();
+      document.body.classList.toggle("is-phone", kind === "phone");
+      document.body.classList.toggle("is-pc", kind === "pc");
+      try { localStorage.setItem("tomasekDevice", kind === "phone" ? "mobile" : "pc"); } catch (_) {}
+      const pill = document.getElementById("devicePill");
+      if (pill) pill.textContent = kind === "phone" ? "Phone layout" : "PC";
+    }
+
+    applyDevice();
+    window.addEventListener("resize", () => { applyDevice(); });
+    window.addEventListener("orientationchange", () => { applyDevice(); });
 
     function openBetaGate() {
       if (betaBusy) return;

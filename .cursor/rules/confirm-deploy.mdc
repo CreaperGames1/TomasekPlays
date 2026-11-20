@@ -1,0 +1,18 @@
+---
+description: When user says confirm, commit and push TomasekPlays site live
+alwaysApply: true
+---
+
+# Confirm = publish to the web
+
+When the user says **confirm** (or "confirm and deploy", "push it", "put it live"):
+
+1. Work in `C:\Users\Tomas\Documents\tomasekplays` (TomasekPlays site → tomasekplays.com via GitHub).
+2. Run `git status`, `git diff`, and `git log -5 --oneline`.
+3. Stage the relevant site changes (HTML/CSS/JS/assets). Do **not** commit secrets.
+4. Commit with a short message about why (HEREDOC / PowerShell here-string).
+5. **Push** to `origin main` immediately so the live site updates.
+6. Reply with the commit summary and that it is live / pushed.
+
+Do this without asking again once they said confirm.
+Only create a commit when they said confirm (or explicitly asked to commit/push/deploy).
