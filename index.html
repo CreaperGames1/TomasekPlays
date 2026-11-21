@@ -914,9 +914,32 @@
       40% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
       100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
     }
+
+    /* Arcade stays on tomasekplays.com — games.html never shows in the address bar */
+    .play-frame {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      z-index: 200;
+      background: var(--bg);
+      display: none;
+    }
+
+    body.playing .play-frame { display: block; }
+    body.playing .atmosphere,
+    body.playing .grid-fade,
+    body.playing .wrap,
+    body.playing .unlock-flash,
+    body.playing .unlock-badge,
+    body.playing .beta-overlay {
+      display: none !important;
+    }
   </style>
 </head>
 <body>
+  <iframe class="play-frame" id="playFrame" title="TomasekPlays Arcade" src="about:blank" allow="fullscreen; gamepad; autoplay"></iframe>
   <div class="atmosphere" aria-hidden="true"></div>
   <div class="grid-fade" aria-hidden="true"></div>
 
@@ -1331,6 +1354,18 @@
       }
     }
 
+    function openArcadeHidden() {
+      const frame = document.getElementById("playFrame");
+      // Load arcade inside the home page so the URL stays tomasekplays.com
+      if (frame.getAttribute("src") !== "games.html") {
+        frame.src = "games.html";
+      }
+      document.body.classList.add("playing");
+      if (location.protocol.startsWith("http")) {
+        history.replaceState(null, "", "/");
+      }
+    }
+
     function playUnlockThenGo() {
       betaBusy = true;
       const gate = document.getElementById("betaGate");
@@ -1353,8 +1388,14 @@
       badge.classList.add("go");
 
       setTimeout(() => {
-        window.location.href = "games.html";
+        openArcadeHidden();
+        betaBusy = false;
       }, 900);
+    }
+
+    // Already unlocked this session → open arcade without exposing /games.html
+    if (sessionStorage.getItem(BETA_KEY) === "1") {
+      openArcadeHidden();
     }
 
     function submitBeta(event) {

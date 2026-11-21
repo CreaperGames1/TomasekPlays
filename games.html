@@ -3,8 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta id="viewportMeta" name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
   <title>Arcade · Tomasek Plays</title>
   <link rel="icon" href="logo.png" type="image/png" />
+  <script>
+    // Keep arcade off the public URL — only open after beta unlock from the home page.
+    (function () {
+      try {
+        if (sessionStorage.getItem("tomasekBetaUnlocked") !== "1") {
+          location.replace("index.html");
+        }
+      } catch (_) {
+        location.replace("index.html");
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -730,7 +743,10 @@
     const on = document.querySelector(".screen.on");
     if (on) on.classList.add("fade-out");
     playFx("Back to home", false, () => {
-      window.location.href = "index.html";
+      try { sessionStorage.removeItem(K.beta); } catch (_) {}
+      const target = "index.html";
+      if (window.top && window.top !== window) window.top.location.href = target;
+      else window.location.href = target;
     });
   }
 

@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /games.html
+Disallow: /controller.html
+Disallow: /downloads/
+Disallow: /videos/
+Disallow: /_check.js
+
+Sitemap: https://tomasekplays.com/
