@@ -949,7 +949,7 @@
         <a class="yt-logo" href="https://www.youtube.com/@TomasekPlays" target="_blank" rel="noopener noreferrer" title="TomasekPlays on YouTube">
           <img src="logo.png" alt="TomasekPlays YouTube" width="44" height="44" />
         </a>
-        <a href="index.html" id="brandTitle">TomasekPlays</a>
+        <a href="/" id="brandTitle">TomasekPlays</a>
       </div>
       <nav class="nav-links" aria-label="Primary">
         <span class="device-pill" id="devicePill">Phone</span>
@@ -1355,7 +1355,9 @@
     }
 
     function keepHomeUrl() {
-      if (location.protocol.startsWith("http")) {
+      if (!location.protocol.startsWith("http")) return;
+      // Hide index.html — address bar always shows tomasekplays.com/
+      if (location.pathname !== "/" || location.search || location.hash) {
         history.replaceState(null, "", "/");
       }
     }
@@ -1366,6 +1368,9 @@
       document.body.classList.add("app-open");
       keepHomeUrl();
     }
+
+    // Always normalize the public URL away from /index.html
+    keepHomeUrl();
 
     function playUnlockThenGo() {
       betaBusy = true;
@@ -1394,12 +1399,10 @@
       }, 900);
     }
 
-    // Bounce targets from direct /games.html or obscure controller visits
+    // Direct controller URL visits never reopen the panel (no code ask) — only arcade bounce + redeem.
     try {
-      if (sessionStorage.getItem("tomasekOpenController") === "1") {
-        sessionStorage.removeItem("tomasekOpenController");
-        if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) openHiddenApp("contr0l2er9.html");
-      } else if (sessionStorage.getItem("tomasekOpenArcade") === "1") {
+      sessionStorage.removeItem("tomasekOpenController");
+      if (sessionStorage.getItem("tomasekOpenArcade") === "1") {
         sessionStorage.removeItem("tomasekOpenArcade");
         if (sessionStorage.getItem(BETA_KEY) === "1") openHiddenApp("games.html");
       } else if (sessionStorage.getItem(BETA_KEY) === "1") {

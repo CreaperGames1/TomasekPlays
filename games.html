@@ -7,21 +7,21 @@
   <title>Arcade · Tomasek Plays</title>
   <link rel="icon" href="logo.png" type="image/png" />
   <script>
-    // Never stay on /games.html in the address bar — always bounce to home (iframe or redirect).
+    // Never stay on /games.html — bounce to / (no code prompt on direct visit).
     (function () {
       try {
         if (window.top === window) {
           if (sessionStorage.getItem("tomasekBetaUnlocked") === "1") {
             sessionStorage.setItem("tomasekOpenArcade", "1");
           }
-          location.replace("index.html");
+          location.replace("/");
           return;
         }
         if (sessionStorage.getItem("tomasekBetaUnlocked") !== "1") {
-          window.top.location.replace("index.html");
+          window.top.location.replace("/");
         }
       } catch (_) {
-        location.replace("index.html");
+        location.replace("/");
       }
     })();
   </script>
@@ -173,15 +173,17 @@
     .pad { display: none; width: min(100%, 420px); gap: .5rem; }
     body.is-mobile .pad { display: grid; }
     .pad.one { grid-template-columns: 1fr; }
-    .pad.dir { grid-template-columns: repeat(3, 1fr); grid-template-rows: 54px 54px; }
+    .pad.dir { grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 54px); }
     .pad button {
       border: 1px solid var(--line); background: rgba(255,255,255,.05); border-radius: 12px;
       font-size: 1.1rem; font-weight: 700; cursor: pointer; min-height: 54px;
+      -webkit-user-select: none; user-select: none; touch-action: manipulation;
     }
-    .pad.dir .u { grid-column: 2; }
+    .pad.dir .u { grid-column: 2; grid-row: 1; }
     .pad.dir .l { grid-column: 1; grid-row: 2; }
     .pad.dir .a { grid-column: 2; grid-row: 2; }
     .pad.dir .r { grid-column: 3; grid-row: 2; }
+    .pad.dir .d { grid-column: 2; grid-row: 3; }
 
     .overlay {
       position: fixed; inset: 0; z-index: 40; display: none; place-items: center;
@@ -356,7 +358,7 @@
           <a class="yt-logo" href="https://www.youtube.com/@TomasekPlays" target="_blank" rel="noopener noreferrer" title="TomasekPlays on YouTube">
             <img src="logo.png" alt="TomasekPlays YouTube" />
           </a>
-          <a href="index.html" id="brandHome">TomasekPlays</a>
+          <a href="/" id="brandHome">TomasekPlays</a>
         </div>
         <div class="nav-r">
           <span class="chip">device <b id="devChip">PC</b></span>
@@ -681,7 +683,8 @@
           <button type="button" class="u" data-k="up">▲</button>
           <button type="button" class="l" data-k="left">◀</button>
           <button type="button" class="a" data-k="action">●</button>
-          <button type="button" class="r" data-k="right">▶</button>`;
+          <button type="button" class="r" data-k="right">▶</button>
+          <button type="button" class="d" data-k="down">▼</button>`;
       } else {
         pad.innerHTML = `<button type="button" data-k="action">TAP / ACTION</button>`;
       }
@@ -751,7 +754,7 @@
     if (on) on.classList.add("fade-out");
     playFx("Back to home", false, () => {
       try { sessionStorage.removeItem(K.beta); } catch (_) {}
-      const target = "index.html";
+      const target = "/";
       if (window.top && window.top !== window) window.top.location.href = target;
       else window.location.href = target;
     });

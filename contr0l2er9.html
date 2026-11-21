@@ -7,21 +7,18 @@
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="logo.png" type="image/png" />
   <script>
-    // Obscure path only — never keep this URL in the address bar; require admin token from redeem.
+    // Direct URL visits always go home with no code prompt. Only the home redeem iframe may load this page.
     (function () {
       try {
         if (window.top === window) {
-          if (sessionStorage.getItem("tomasekAdminToken")) {
-            sessionStorage.setItem("tomasekOpenController", "1");
-          }
-          location.replace("index.html");
+          location.replace("/");
           return;
         }
         if (!sessionStorage.getItem("tomasekAdminToken")) {
-          window.top.location.replace("index.html");
+          window.top.location.replace("/");
         }
       } catch (_) {
-        location.replace("index.html");
+        location.replace("/");
       }
     })();
   </script>
@@ -457,28 +454,10 @@
     <p class="status" id="status" aria-live="polite"></p>
   </div>
 
-  <div class="gate" id="gate">
-    <div class="gate-box">
-      <h2>Unlock controller</h2>
-      <p>Enter your admin code to open remote controls.</p>
-      <form class="gate-fields" id="gateForm" autocomplete="off">
-        <label class="f">Code
-          <input id="gateCode" maxlength="48" placeholder="Enter code" required />
-        </label>
-        <p class="gate-err" id="gateErr" aria-live="polite"></p>
-        <div class="gate-actions">
-          <button type="button" class="btn btn-ghost" id="gateCancel">Cancel</button>
-          <button type="submit" class="btn btn-accent" id="gateSubmit">Unlock</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
   <script>
     const ADMIN_API = "https://tomasekplays-admin.tomasekplays.workers.dev";
     const TOKEN_KEY = "tomasekAdminToken";
 
-    const gate = document.getElementById("gate");
     const controls = document.getElementById("controls");
     const statusEl = document.getElementById("status");
     const livePill = document.getElementById("livePill");
@@ -488,10 +467,6 @@
     function setStatus(text, kind) {
       statusEl.textContent = text || "";
       statusEl.className = "status" + (kind ? " " + kind : "");
-    }
-
-    function normalizeCode(raw) {
-      return String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     }
 
     function getToken() {
@@ -506,7 +481,6 @@
     }
 
     function showUnlocked() {
-      gate.hidden = true;
       controls.hidden = false;
       btnLock.hidden = false;
       livePill.textContent = "Unlocked";
@@ -515,36 +489,15 @@
     function goHomeTop() {
       setToken("");
       try { sessionStorage.removeItem("tomasekOpenController"); } catch (_) {}
-      const target = "index.html";
+      const target = "/";
       if (window.top && window.top !== window) window.top.location.href = target;
       else window.location.href = target;
-    }
-
-    function showLocked() {
-      goHomeTop();
-    }
-
-    async function unlock(code) {
-      const res = await fetch(ADMIN_API.replace(/\/$/, "") + "/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code })
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok || !data.token) {
-        const err = new Error(data.error || "wrong_code");
-        err.code = data.error;
-        throw err;
-      }
-      setToken(data.token);
-      showUnlocked();
-      setStatus("Controller unlocked.", "ok");
     }
 
     async function sendCommand(body) {
       const token = getToken();
       if (!token) {
-        showLocked();
+        goHomeTop();
         throw new Error("unauthorized");
       }
       const res = await fetch(ADMIN_API.replace(/\/$/, "") + "/command", {
@@ -557,7 +510,7 @@
       });
       const data = await res.json().catch(() => ({}));
       if (res.status === 401) {
-        showLocked();
+        goHomeTop();
         throw new Error("unauthorized");
       }
       if (!res.ok) {
@@ -569,34 +522,12 @@
       return data;
     }
 
-    document.getElementById("gateForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (busy) return;
-      const err = document.getElementById("gateErr");
-      const submit = document.getElementById("gateSubmit");
-      const code = normalizeCode(document.getElementById("gateCode").value);
-      busy = true;
-      submit.disabled = true;
-      err.textContent = "Checking…";
-      err.className = "gate-err";
-      try {
-        await unlock(code);
-      } catch (_) {
-        err.textContent = "Wrong code. Try again.";
-        err.className = "gate-err";
-      } finally {
-        busy = false;
-        submit.disabled = false;
-      }
-    });
-
     btnLock.addEventListener("click", () => goHomeTop());
     document.getElementById("btnHome").addEventListener("click", () => goHomeTop());
     document.getElementById("brandHome").addEventListener("click", (e) => {
       e.preventDefault();
       goHomeTop();
     });
-    document.getElementById("gateCancel").addEventListener("click", () => goHomeTop());
 
     document.querySelectorAll("[data-action]").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -648,10 +579,10 @@
       });
     });
 
-    // Opened from home redeem only (token already stored) — never expose this page URL
+    // Only reachable from home redeem iframe with a token — no on-page code prompt
     if (getToken()) {
       showUnlocked();
-      setStatus("Session restored.", "ok");
+      setStatus("Ready.", "ok");
     } else {
       goHomeTop();
     }
