@@ -1107,6 +1107,22 @@
     </div>
   </div>
 
+  <div class="beta-overlay" id="downloadHelpGate" role="dialog" aria-modal="true" aria-labelledby="downloadHelpTitle">
+    <div class="beta-modal" id="downloadHelpModal" style="width:min(480px,100%)">
+      <h2 id="downloadHelpTitle">Download started</h2>
+      <p id="downloadHelpLead">Official TomasekPlays app from this site. Windows may warn because it is a new publisher — that is normal.</p>
+      <ol class="install-steps">
+        <li>Open the downloaded <strong id="downloadHelpFile">TomasekPlays.exe</strong>.</li>
+        <li>If you see <strong>Windows protected your PC</strong> → click <strong>More info</strong> → <strong>Run anyway</strong>.</li>
+        <li>If your browser says the file is uncommon → keep / open anyway (it came from tomasekplays.com).</li>
+      </ol>
+      <div class="beta-actions">
+        <button type="button" class="btn-cancel" onclick="closeDownloadHelp()">Close</button>
+        <button type="button" class="btn-play" onclick="closeDownloadHelp()">Got it</button>
+      </div>
+    </div>
+  </div>
+
   <div class="beta-overlay" id="adminGate" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
     <div class="admin-shell" id="adminShell">
       <div class="admin-top">
@@ -1153,9 +1169,9 @@
     const REDEEM_CODES = {
       ONE4EXES: {
         type: "download",
-        href: "downloads/TomasekPlays.exe",
+        href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
         filename: "TomasekPlays.exe",
-        ok: "Downloading TomasekPlays.exe — replace the old file if asked."
+        ok: "Download started — see the Windows tip if SmartScreen appears."
       },
       ONE4APP: {
         type: "homescreen",
@@ -1166,9 +1182,9 @@
       },
       ONE4BETAEXES: {
         type: "download",
-        href: "downloads/TomasekPlays-Owners.exe",
+        href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.exe",
         filename: "TomasekPlays-Owners.exe",
-        ok: "Downloading TomasekPlays-Owners.exe — replace the old file if asked."
+        ok: "Owners download started — see the Windows tip if SmartScreen appears."
       }
     };
     let betaBusy = false;
@@ -1250,6 +1266,7 @@
       closeContact();
       closeAdminGate();
       closeHomescreenGate();
+      closeDownloadHelp();
       const gate = document.getElementById("redeemGate");
       const modal = document.getElementById("redeemModal");
       const err = document.getElementById("redeemError");
@@ -1270,6 +1287,21 @@
 
     function closeHomescreenGate() {
       document.getElementById("homescreenGate").classList.remove("open");
+    }
+
+    function closeDownloadHelp() {
+      document.getElementById("downloadHelpGate").classList.remove("open");
+    }
+
+    function openDownloadHelp(filename) {
+      closeRedeemGate();
+      closeHomescreenGate();
+      closeAdminGate();
+      closeContact();
+      const name = filename || "TomasekPlays.exe";
+      const fileEl = document.getElementById("downloadHelpFile");
+      if (fileEl) fileEl.textContent = name;
+      document.getElementById("downloadHelpGate").classList.add("open");
     }
 
     function openHomescreenGuide() {
@@ -1323,7 +1355,7 @@
       const err = document.getElementById("redeemError");
       const input = document.getElementById("redeemCode");
       const modal = document.getElementById("redeemModal");
-      err.textContent = reward.ok || `Downloading ${reward.filename} — replace the old file if asked.`;
+      err.textContent = reward.ok || `Downloading ${reward.filename}…`;
       err.classList.add("ok-msg");
       input.classList.add("ok");
       modal.classList.add("unlock");
@@ -1339,7 +1371,7 @@
       a.click();
       a.remove();
 
-      setTimeout(() => closeRedeemGate(), 1600);
+      setTimeout(() => openDownloadHelp(reward.filename), 700);
     }
 
     async function tryAdminAuth(code) {
@@ -1530,6 +1562,13 @@
 
     function keepHomeUrl() {
       if (!location.protocol.startsWith("http")) return;
+      // Owners desktop app: remember before stripping ?owners=1
+      try {
+        if (/[?&]owners=1(?:&|$)/.test(location.search || "")) {
+          sessionStorage.setItem("tomasekOwnersApp", "1");
+          window.TOMASEK_OWNERS = true;
+        }
+      } catch (_) {}
       // Hide index.html — address bar always shows tomasekplays.com/
       if (location.pathname !== "/" || location.search || location.hash) {
         history.replaceState(null, "", "/");
@@ -1631,6 +1670,10 @@
       if (e.target.id === "homescreenGate") closeHomescreenGate();
     });
 
+    document.getElementById("downloadHelpGate").addEventListener("click", (e) => {
+      if (e.target.id === "downloadHelpGate") closeDownloadHelp();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !betaBusy) {
         closeBetaGate();
@@ -1638,6 +1681,7 @@
         closeRedeemGate();
         closeAdminGate();
         closeHomescreenGate();
+        closeDownloadHelp();
       }
     });
   </script>

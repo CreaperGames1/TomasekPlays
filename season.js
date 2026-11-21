@@ -1,22 +1,39 @@
 /**
- * TomasekPlays seasonal themes + owners daily gate.
+ * TomasekPlays seasonal themes + owners gate.
  * Christmas redeem available from 1 December 2026 (public).
- * Owners app (?owners=1) can use Christmas anytime + daily OWN4 unlock.
+ * Owners app: OWN4 required each launch; Christmas theme anytime.
  */
 (function () {
   const THEME_KEY = "tomasekTheme";
-  const OWN_DAY_KEY = "tomasekOwnDay";
+  const OWN_SESSION_KEY = "tomasekOwnUnlocked";
+  const OWNERS_FLAG_KEY = "tomasekOwnersApp";
   const CHRISTMAS_START = new Date(2026, 11, 1); // 1 Dec 2026 local
   const OWNERS_DAILY_CODE = "OWN4";
 
-  function todayKey() {
-    const d = new Date();
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  /** Capture ?owners=1 before the site strips the query from the URL. */
+  function captureOwnersFlag() {
+    try {
+      if (/[?&]owners=1(?:&|$)/.test(location.search || "")) {
+        sessionStorage.setItem(OWNERS_FLAG_KEY, "1");
+        window.TOMASEK_OWNERS = true;
+      }
+      if (window.TOMASEK_OWNERS === true) {
+        sessionStorage.setItem(OWNERS_FLAG_KEY, "1");
+      }
+      try {
+        if (window.top && window.top !== window && window.top.TOMASEK_OWNERS === true) {
+          sessionStorage.setItem(OWNERS_FLAG_KEY, "1");
+          window.TOMASEK_OWNERS = true;
+        }
+      } catch (_) {}
+    } catch (_) {}
   }
 
   function isOwnersApp() {
     try {
+      captureOwnersFlag();
       if (window.TOMASEK_OWNERS === true) return true;
+      if (sessionStorage.getItem(OWNERS_FLAG_KEY) === "1") return true;
       return /[?&]owners=1(?:&|$)/.test(location.search || "");
     } catch (_) {
       return false;
@@ -191,7 +208,6 @@
     showChristmasWait,
     closeChristmasWait,
     OWNERS_DAILY_CODE,
-    todayKey,
     handleRedeem(code) {
       if (code === "CHRISTMAS") return redeemChristmas();
       return null;
@@ -200,7 +216,9 @@
 
   function mountOwnersGate() {
     if (!isOwnersApp()) return;
-    if (localStorage.getItem(OWN_DAY_KEY) === todayKey()) return;
+    try {
+      if (sessionStorage.getItem(OWN_SESSION_KEY) === "1") return;
+    } catch (_) {}
 
     const gate = document.createElement("div");
     gate.className = "own-gate on";
@@ -208,13 +226,13 @@
     gate.innerHTML = `
       <div class="box">
         <h2>Owners build</h2>
-        <p>Enter today's owners code to continue. Extra redeem codes (Christmas and more) work here.</p>
+        <p>Enter <strong>OWN4</strong> to open the app. After that, redeem <strong>CHRISTMAS</strong> anytime for the Christmas theme.</p>
         <form id="ownForm" autocomplete="off">
-          <label>Daily code
-            <input id="ownCode" maxlength="24" placeholder="CODE" required autocapitalize="characters" spellcheck="false" />
+          <label>Owners code
+            <input id="ownCode" maxlength="24" placeholder="OWN4" required autocapitalize="characters" spellcheck="false" />
           </label>
           <p class="err" id="ownErr"></p>
-          <button type="submit">Unlock for today</button>
+          <button type="submit">Enter app</button>
         </form>
       </div>`;
     document.body.appendChild(gate);
@@ -236,10 +254,10 @@
       bump();
       const entered = String(input.value || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
       if (entered !== OWNERS_DAILY_CODE) {
-        gate.querySelector("#ownErr").textContent = "Wrong code. Try again.";
+        gate.querySelector("#ownErr").textContent = "Wrong code. Enter OWN4.";
         return;
       }
-      try { localStorage.setItem(OWN_DAY_KEY, todayKey()); } catch (_) {}
+      try { sessionStorage.setItem(OWN_SESSION_KEY, "1"); } catch (_) {}
       gate.classList.remove("on");
       gate.remove();
     });

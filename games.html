@@ -423,6 +423,19 @@
     </div>
   </div>
 
+  <div class="overlay" id="downloadHelp">
+    <div class="card" style="width:min(480px,100%)">
+      <h1>Download started</h1>
+      <p>Official TomasekPlays app from this site. Windows may warn because it is a new publisher — that is normal.</p>
+      <ol style="margin:0 0 1rem;padding-left:1.2rem;color:var(--ink);line-height:1.55;display:grid;gap:.55rem">
+        <li>Open the downloaded <strong id="dlHelpFile">TomasekPlays.exe</strong>.</li>
+        <li>If you see <strong>Windows protected your PC</strong> → click <strong>More info</strong> → <strong>Run anyway</strong>.</li>
+        <li>If your browser says the file is uncommon → keep / open anyway (it came from tomasekplays.com).</li>
+      </ol>
+      <button type="button" class="btn btn-a" id="dlHelpClose">Got it</button>
+    </div>
+  </div>
+
   <div class="overlay" id="settings">
     <div class="card" style="width:min(440px,100%)">
       <h1>Settings</h1>
@@ -1406,9 +1419,9 @@
   const REDEEM_CODES = {
     ONE4EXES: {
       type: "download",
-      href: "downloads/TomasekPlays.exe",
+      href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
       filename: "TomasekPlays.exe",
-      ok: "Downloading TomasekPlays.exe — replace the old file if asked."
+      ok: "Download started — see the Windows tip if SmartScreen appears."
     },
     ONE4APP: {
       type: "homescreen",
@@ -1419,9 +1432,9 @@
     },
     ONE4BETAEXES: {
       type: "download",
-      href: "downloads/TomasekPlays-Owners.exe",
+      href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.exe",
       filename: "TomasekPlays-Owners.exe",
-      ok: "Downloading TomasekPlays-Owners.exe — replace the old file if asked."
+      ok: "Owners download started — see the Windows tip if SmartScreen appears."
     }
   };
 
@@ -1475,10 +1488,19 @@
     e.preventDefault();
     openRedeem();
   };
+  function openDownloadHelp(filename) {
+    closeRedeem();
+    const el = $("dlHelpFile");
+    if (el) el.textContent = filename || "TomasekPlays.exe";
+    $("downloadHelp").classList.add("on");
+  }
+
   $("redeemCancel").onclick = closeRedeem;
   $("redeem").onclick = (e) => { if (e.target.id === "redeem") closeRedeem(); };
   $("hsClose").onclick = () => $("homescreen").classList.remove("on");
   $("homescreen").onclick = (e) => { if (e.target.id === "homescreen") $("homescreen").classList.remove("on"); };
+  $("dlHelpClose").onclick = () => $("downloadHelp").classList.remove("on");
+  $("downloadHelp").onclick = (e) => { if (e.target.id === "downloadHelp") $("downloadHelp").classList.remove("on"); };
   $("redeemCode").addEventListener("input", () => forceRedeemCaps($("redeemCode")));
   $("redeemCode").addEventListener("blur", () => forceRedeemCaps($("redeemCode")));
   $("redeemForm").onsubmit = (e) => {
@@ -1494,7 +1516,7 @@
     }
     if (reward.type === "download") {
       err.classList.add("ok");
-      err.textContent = reward.ok || `Downloading ${reward.filename} — replace the old file if asked.`;
+      err.textContent = reward.ok || `Downloading ${reward.filename}…`;
       $("redeemSubmit").disabled = true;
       const a = document.createElement("a");
       const bust = `v=${Date.now()}`;
@@ -1504,7 +1526,10 @@
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(closeRedeem, 1600);
+      setTimeout(() => {
+        $("redeemSubmit").disabled = false;
+        openDownloadHelp(reward.filename);
+      }, 700);
     }
     if (reward.type === "homescreen") {
       err.classList.add("ok");
