@@ -47,11 +47,73 @@
     return now >= start;
   }
 
+  function ensureSnowLayer() {
+    let layer = document.getElementById("xmasSnow");
+    if (layer) return layer;
+    layer = document.createElement("div");
+    layer.id = "xmasSnow";
+    layer.className = "xmas-snow";
+    layer.setAttribute("aria-hidden", "true");
+    const count = 56;
+    let html = "";
+    for (let i = 0; i < count; i++) {
+      const left = (Math.random() * 100).toFixed(2);
+      const delay = (Math.random() * 12).toFixed(2);
+      const dur = (9 + Math.random() * 14).toFixed(2);
+      const size = (2 + Math.random() * 5).toFixed(1);
+      const drift = (-40 + Math.random() * 80).toFixed(0);
+      const opacity = (0.35 + Math.random() * 0.55).toFixed(2);
+      html += `<i style="left:${left}%;--d:${delay}s;--t:${dur}s;--s:${size}px;--x:${drift}px;--o:${opacity}"></i>`;
+    }
+    layer.innerHTML = html;
+    document.body.appendChild(layer);
+    return layer;
+  }
+
+  function ensureLightsLayer() {
+    let lights = document.getElementById("xmasLights");
+    if (lights) return lights;
+    lights = document.createElement("div");
+    lights.id = "xmasLights";
+    lights.className = "xmas-lights";
+    lights.setAttribute("aria-hidden", "true");
+    const colors = ["#ff6b6b", "#7dffb3", "#ffd76a", "#7eb6ff", "#ff8fab"];
+    let html = "";
+    for (let i = 0; i < 18; i++) {
+      const c = colors[i % colors.length];
+      html += `<span style="--c:${c};--i:${i}"></span>`;
+    }
+    lights.innerHTML = html;
+    document.body.appendChild(lights);
+    return lights;
+  }
+
+  function setChristmasAmbient(on) {
+    const snow = ensureSnowLayer();
+    const lights = ensureLightsLayer();
+    snow.classList.toggle("on", !!on);
+    lights.classList.toggle("on", !!on);
+    document.body.classList.toggle("xmas-ambient", !!on);
+  }
+
   function applyTheme(name) {
-    document.body.classList.toggle("theme-christmas", name === "christmas");
+    const isXmas = name === "christmas";
+    document.body.classList.toggle("theme-christmas", isXmas);
+    setChristmasAmbient(isXmas);
     try {
       if (name) localStorage.setItem(THEME_KEY, name);
       else localStorage.removeItem(THEME_KEY);
+    } catch (_) {}
+    // Keep arcade iframe in sync (ambient only — avoid recursive applyTheme)
+    try {
+      const frame = document.getElementById("appFrame");
+      const win = frame && frame.contentWindow;
+      if (win && win.document && win.document.body) {
+        win.document.body.classList.toggle("theme-christmas", isXmas);
+        if (win.TomasekSeason && typeof win.TomasekSeason.setChristmasAmbient === "function") {
+          win.TomasekSeason.setChristmasAmbient(isXmas);
+        }
+      }
     } catch (_) {}
   }
 
@@ -60,6 +122,7 @@
       const t = localStorage.getItem(THEME_KEY);
       if (t === "christmas" && christmasOpen()) applyTheme("christmas");
       else if (t === "christmas" && !christmasOpen()) applyTheme("");
+      else setChristmasAmbient(false);
     } catch (_) {}
   }
 
@@ -205,6 +268,7 @@
     playChristmasAnim,
     applyTheme,
     restoreTheme,
+    setChristmasAmbient,
     showChristmasWait,
     closeChristmasWait,
     OWNERS_DAILY_CODE,

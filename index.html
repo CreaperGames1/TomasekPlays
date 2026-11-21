@@ -1168,11 +1168,8 @@
     const ADMIN_TOKEN_KEY = "tomasekAdminToken";
     const REDEEM_CODES = {
       ONE4EXES: {
-        type: "download",
-        href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
-        filename: "TomasekPlays.exe",
-        ok: "Downloading TomasekPlays.exe…",
-        noReplace: true
+        type: "webapp",
+        ok: "This website is the app — always updated, no download. You’re set."
       },
       ONE4APP: {
         type: "homescreen",
@@ -1338,7 +1335,7 @@
           <li><strong>iPhone:</strong> Safari → <strong>Share</strong> → <strong>Add to Home Screen</strong>.</li>
           <li><strong>Android:</strong> Chrome → <strong>⋮</strong> → <strong>Add to Home screen</strong>.</li>
           <li>Open the new icon anytime — no App Store needed.</li>
-          <li>PC download instead? Redeem code <strong>ONE4EXES</strong>.</li>`;
+          <li>PC: use <strong>tomasekplays.com</strong> in your browser — always updated (code <strong>ONE4EXES</strong>).</li>`;
       }
 
       document.getElementById("homescreenGate").classList.add("open");
@@ -1475,6 +1472,19 @@
 
       if (reward && reward.type === "download") {
         runRedeemDownload(reward);
+        return false;
+      }
+
+      if (reward && reward.type === "webapp") {
+        err.textContent = reward.ok || "This website is the app — always updated.";
+        err.classList.add("ok-msg");
+        input.classList.add("ok");
+        modal.classList.add("unlock");
+        document.getElementById("redeemSubmit").disabled = true;
+        setTimeout(() => {
+          document.getElementById("redeemSubmit").disabled = false;
+          closeRedeemGate();
+        }, 1800);
         return false;
       }
 

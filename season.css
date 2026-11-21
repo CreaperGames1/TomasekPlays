@@ -1,26 +1,143 @@
 /* Seasonal themes (Christmas from 1 Dec 2026) */
 
 body.theme-christmas {
-  --bg: #0a1210;
-  --bg-elevated: #12201a;
+  --bg: #07110e;
+  --bg-elevated: #12241c;
   --ink: #f7f3ea;
-  --muted: rgba(247, 243, 234, 0.58);
-  --line: rgba(247, 243, 234, 0.12);
+  --muted: rgba(247, 243, 234, 0.6);
+  --line: rgba(247, 243, 234, 0.14);
   --accent: #7dffb3;
-  --accent-dim: rgba(125, 255, 179, 0.16);
+  --accent-dim: rgba(125, 255, 179, 0.18);
   --warm: #ff6b6b;
 }
 
 body.theme-christmas .atmosphere,
 body.theme-christmas .bg {
   background:
-    radial-gradient(ellipse 70% 50% at 80% 10%, rgba(255, 107, 107, 0.16), transparent 55%),
-    radial-gradient(ellipse 55% 45% at 10% 85%, rgba(125, 255, 179, 0.12), transparent 50%),
-    linear-gradient(180deg, #0e1a16 0%, #0a1210 45%, #07110e 100%) !important;
+    radial-gradient(ellipse 55% 40% at 50% -5%, rgba(255, 215, 106, 0.12), transparent 55%),
+    radial-gradient(ellipse 70% 50% at 85% 8%, rgba(255, 107, 107, 0.22), transparent 55%),
+    radial-gradient(ellipse 55% 45% at 8% 88%, rgba(125, 255, 179, 0.16), transparent 50%),
+    radial-gradient(ellipse 40% 30% at 70% 70%, rgba(126, 182, 255, 0.08), transparent 50%),
+    linear-gradient(180deg, #10241c 0%, #0a1612 42%, #050c0a 100%) !important;
 }
 
 body.theme-christmas .grid-fade {
-  opacity: 0.22;
+  opacity: 0.14;
+}
+
+body.theme-christmas .brand-hero,
+body.theme-christmas .brand a,
+body.theme-christmas h1 {
+  text-shadow: 0 0 28px rgba(125, 255, 179, 0.22), 0 0 48px rgba(255, 107, 107, 0.1);
+}
+
+body.theme-christmas .nav-cta,
+body.theme-christmas .btn-play,
+body.theme-christmas .btn.btn-a {
+  box-shadow: 0 0 0 1px rgba(125, 255, 179, 0.2), 0 10px 32px rgba(125, 255, 179, 0.12);
+}
+
+/* Continuous snowfall */
+.xmas-snow {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.6s ease;
+}
+.xmas-snow.on {
+  opacity: 1;
+  visibility: visible;
+}
+.xmas-snow i {
+  position: absolute;
+  top: -8%;
+  width: var(--s, 4px);
+  height: var(--s, 4px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, rgba(255, 255, 255, 0.55));
+  opacity: var(--o, 0.7);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.35);
+  animation: xmasDrift var(--t, 14s) var(--d, 0s) linear infinite;
+}
+@keyframes xmasDrift {
+  0% {
+    transform: translate3d(0, -5vh, 0);
+    opacity: 0;
+  }
+  8% { opacity: var(--o, 0.7); }
+  100% {
+    transform: translate3d(var(--x, 20px), 110vh, 0);
+    opacity: 0.12;
+  }
+}
+
+/* String lights along the top */
+.xmas-lights {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  height: 28px;
+  display: none;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  padding: 0 4vw;
+  pointer-events: none;
+}
+.xmas-lights.on { display: flex; }
+.xmas-lights::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 2%;
+  right: 2%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(247, 243, 234, 0.25), transparent);
+}
+.xmas-lights span {
+  position: relative;
+  width: 10px;
+  height: 14px;
+  margin-top: 4px;
+  border-radius: 50% 50% 45% 45%;
+  background: var(--c, #ff6b6b);
+  box-shadow:
+    0 0 8px var(--c, #ff6b6b),
+    0 0 18px color-mix(in srgb, var(--c, #ff6b6b) 55%, transparent);
+  animation: xmasBulb 1.6s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i, 0) * 0.12s);
+}
+.xmas-lights span::before {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 4px;
+  height: 6px;
+  transform: translateX(-50%);
+  background: #3a3a32;
+  border-radius: 1px;
+}
+@keyframes xmasBulb {
+  from { filter: brightness(0.75); opacity: 0.75; }
+  to { filter: brightness(1.25); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .xmas-snow i,
+  .xmas-lights span {
+    animation: none !important;
+  }
+  .xmas-snow i {
+    opacity: 0.35;
+    top: auto;
+    bottom: 20%;
+  }
 }
 
 .season-fx {

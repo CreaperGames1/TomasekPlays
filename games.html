@@ -1418,11 +1418,8 @@
 
   const REDEEM_CODES = {
     ONE4EXES: {
-      type: "download",
-      href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
-      filename: "TomasekPlays.exe",
-      ok: "Downloading TomasekPlays.exe…",
-      noReplace: true
+      type: "webapp",
+      ok: "This website is the app — always updated, no download. You’re set."
     },
     ONE4APP: {
       type: "homescreen",
@@ -1481,7 +1478,7 @@
       $("hsSteps").innerHTML = "<li>Open <strong>tomasekplays.com</strong> in <strong>Chrome</strong>.</li><li>Tap <strong>⋮</strong> (top right).</li><li>Tap <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li><li>Confirm.</li>";
     } else {
       $("hsLead").textContent = "Phone home screen";
-      $("hsSteps").innerHTML = "<li><strong>iPhone:</strong> Safari → Share → Add to Home Screen.</li><li><strong>Android:</strong> Chrome → ⋮ → Add to Home screen.</li><li>PC download? Redeem <strong>ONE4EXES</strong>.</li>";
+      $("hsSteps").innerHTML = "<li><strong>iPhone:</strong> Safari → Share → Add to Home Screen.</li><li><strong>Android:</strong> Chrome → ⋮ → Add to Home screen.</li><li><strong>PC:</strong> use tomasekplays.com in your browser (code <strong>ONE4EXES</strong>).</li>";
     }
     $("homescreen").classList.add("on");
   }
@@ -1543,6 +1540,15 @@
           closeRedeem();
         }, 1600);
       }
+    }
+    if (reward.type === "webapp") {
+      err.classList.add("ok");
+      err.textContent = reward.ok || "This website is the app — always updated.";
+      $("redeemSubmit").disabled = true;
+      setTimeout(() => {
+        $("redeemSubmit").disabled = false;
+        closeRedeem();
+      }, 1800);
     }
     if (reward.type === "homescreen") {
       err.classList.add("ok");
