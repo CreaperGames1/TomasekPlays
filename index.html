@@ -1168,8 +1168,10 @@
     const ADMIN_TOKEN_KEY = "tomasekAdminToken";
     const REDEEM_CODES = {
       ONE4EXES: {
-        type: "webapp",
-        ok: "This website is the app — always updated, no download. You’re set."
+        type: "download",
+        href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
+        filename: "TomasekPlays.exe",
+        ok: "Downloading TomasekPlays.exe…"
       },
       ONE4APP: {
         type: "homescreen",
@@ -1335,7 +1337,7 @@
           <li><strong>iPhone:</strong> Safari → <strong>Share</strong> → <strong>Add to Home Screen</strong>.</li>
           <li><strong>Android:</strong> Chrome → <strong>⋮</strong> → <strong>Add to Home screen</strong>.</li>
           <li>Open the new icon anytime — no App Store needed.</li>
-          <li>PC: use <strong>tomasekplays.com</strong> in your browser — always updated (code <strong>ONE4EXES</strong>).</li>`;
+          <li>PC download? Redeem code <strong>ONE4EXES</strong>.</li>`;
       }
 
       document.getElementById("homescreenGate").classList.add("open");
