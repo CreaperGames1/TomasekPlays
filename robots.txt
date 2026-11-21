@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /games.html
 Disallow: /controller.html
+Disallow: /contr0l2er9.html
 Disallow: /downloads/
 Disallow: /videos/
 Disallow: /_check.js

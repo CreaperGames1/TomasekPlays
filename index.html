@@ -1190,7 +1190,7 @@
     }
 
     function openAdminGate() {
-      openHiddenApp("controller.html");
+      openHiddenApp("contr0l2er9.html");
     }
 
     function runRedeemDownload(reward) {
@@ -1394,11 +1394,11 @@
       }, 900);
     }
 
-    // Bounce targets from direct /games.html or /controller.html visits
+    // Bounce targets from direct /games.html or obscure controller visits
     try {
       if (sessionStorage.getItem("tomasekOpenController") === "1") {
         sessionStorage.removeItem("tomasekOpenController");
-        if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) openHiddenApp("controller.html");
+        if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) openHiddenApp("contr0l2er9.html");
       } else if (sessionStorage.getItem("tomasekOpenArcade") === "1") {
         sessionStorage.removeItem("tomasekOpenArcade");
         if (sessionStorage.getItem(BETA_KEY) === "1") openHiddenApp("games.html");
