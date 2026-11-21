@@ -7,12 +7,19 @@
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="logo.png" type="image/png" />
   <script>
-    // Direct URL visits always go home with no code prompt. Only the home redeem iframe may load this page.
+    // Direct URL visits always go home. Only the home-page iframe may load this after redeem.
     (function () {
       try {
         if (window.top === window) {
           location.replace("/");
           return;
+        }
+        // Same-origin parent shares sessionStorage; copy if this context is empty.
+        if (!sessionStorage.getItem("tomasekAdminToken") && window.parent) {
+          try {
+            const t = window.parent.sessionStorage.getItem("tomasekAdminToken");
+            if (t) sessionStorage.setItem("tomasekAdminToken", t);
+          } catch (_) {}
         }
         if (!sessionStorage.getItem("tomasekAdminToken")) {
           window.top.location.replace("/");

@@ -1110,11 +1110,11 @@
   <div class="beta-overlay" id="downloadHelpGate" role="dialog" aria-modal="true" aria-labelledby="downloadHelpTitle">
     <div class="beta-modal" id="downloadHelpModal" style="width:min(480px,100%)">
       <h2 id="downloadHelpTitle">Owners download</h2>
-      <p id="downloadHelpLead">Owners build only — Windows SmartScreen may warn. That is expected for this file.</p>
+      <p id="downloadHelpLead">Downloaded as a zip so Chrome won’t block it.</p>
       <ol class="install-steps">
-        <li>Open the downloaded <strong id="downloadHelpFile">TomasekPlays-Owners.exe</strong>.</li>
-        <li>If you see <strong>Windows protected your PC</strong> → click <strong>More info</strong> → <strong>Run anyway</strong>.</li>
-        <li>If your browser says the file is uncommon → keep / open anyway.</li>
+        <li>Open <strong id="downloadHelpFile">TomasekPlays-Owners.zip</strong> and extract it.</li>
+        <li>Run <strong>TomasekPlays-Owners.exe</strong> inside the folder.</li>
+        <li>If Windows asks → <strong>More info</strong> → <strong>Run anyway</strong>.</li>
       </ol>
       <div class="beta-actions">
         <button type="button" class="btn-cancel" onclick="closeDownloadHelp()">Close</button>
@@ -1169,9 +1169,9 @@
     const REDEEM_CODES = {
       ONE4EXES: {
         type: "download",
-        href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
-        filename: "TomasekPlays.exe",
-        ok: "Downloading TomasekPlays.exe…"
+        href: "https://tomasekplays.com/downloads/TomasekPlays.zip",
+        filename: "TomasekPlays.zip",
+        ok: "Downloading TomasekPlays.zip — unzip, then open TomasekPlays.exe"
       },
       ONE4APP: {
         type: "homescreen",
@@ -1182,9 +1182,9 @@
       },
       ONE4BETAEXES: {
         type: "download",
-        href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.exe",
-        filename: "TomasekPlays-Owners.exe",
-        ok: "Owners download started — see the Windows tip if SmartScreen appears.",
+        href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.zip",
+        filename: "TomasekPlays-Owners.zip",
+        ok: "Downloading TomasekPlays-Owners.zip — unzip, then open the exe",
         smartScreenHelp: true
       }
     };
@@ -1349,6 +1349,11 @@
     }
 
     function openAdminGate() {
+      closeRedeemGate();
+      closeBetaGate();
+      closeContact();
+      closeHomescreenGate();
+      closeDownloadHelp();
       openHiddenApp("contr0l2er9.html");
     }
 
@@ -1362,19 +1367,26 @@
       modal.classList.add("unlock");
       document.getElementById("redeemSubmit").disabled = true;
 
-      // Owners: cache-bust so the new file replaces. Normal: stable URL (no replace / new SmartScreen hash).
+      // Zip downloads avoid Chrome blocking .exe. Navigate so the browser treats it as a normal file save.
+      const bust = `v=${Date.now()}`;
+      const url = reward.href + (reward.href.indexOf("?") >= 0 ? "&" : "?") + bust;
       const a = document.createElement("a");
-      if (reward.noReplace) {
-        a.href = reward.href;
-      } else {
-        const bust = `v=${Date.now()}`;
-        a.href = reward.href + (reward.href.indexOf("?") >= 0 ? "&" : "?") + bust;
-      }
+      a.href = url;
       a.download = reward.filename;
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
       a.remove();
+      // Fallback if the click is ignored
+      setTimeout(() => {
+        try {
+          const iframe = document.createElement("iframe");
+          iframe.style.display = "none";
+          iframe.src = url;
+          document.body.appendChild(iframe);
+          setTimeout(() => iframe.remove(), 60000);
+        } catch (_) {}
+      }, 400);
 
       if (reward.smartScreenHelp) {
         setTimeout(() => openDownloadHelp(reward.filename), 700);
@@ -1599,10 +1611,18 @@
 
     function openHiddenApp(page) {
       const frame = document.getElementById("appFrame");
-      if (frame.getAttribute("src") !== page) frame.src = page;
+      // Always set .src so switching arcade ↔ controller reloads the page.
+      frame.src = page;
       document.body.classList.add("app-open");
       keepHomeUrl();
     }
+
+    // Arcade (iframe) redeems the controller code and asks the home page to open it.
+    window.addEventListener("message", (e) => {
+      if (e.origin !== location.origin) return;
+      if (!e.data || e.data.type !== "tomasekOpenController") return;
+      if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) openAdminGate();
+    });
 
     // Always normalize the public URL away from /index.html
     keepHomeUrl();
