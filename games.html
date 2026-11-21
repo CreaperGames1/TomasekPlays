@@ -412,6 +412,15 @@
     </div>
   </div>
 
+  <div class="overlay" id="homescreen">
+    <div class="card" style="width:min(460px,100%)">
+      <h1>Add to Home Screen</h1>
+      <p id="hsLead">Put TomasekPlays on your phone like an app.</p>
+      <ol id="hsSteps" style="margin:0 0 1rem;padding-left:1.2rem;color:var(--ink);line-height:1.55;display:grid;gap:.55rem"></ol>
+      <button type="button" class="btn btn-a" id="hsClose">Got it</button>
+    </div>
+  </div>
+
   <div class="overlay" id="settings">
     <div class="card" style="width:min(440px,100%)">
       <h1>Settings</h1>
@@ -1398,6 +1407,10 @@
       href: "downloads/TomasekPlays.exe",
       filename: "TomasekPlays.exe",
       ok: "Downloading TomasekPlays.exe…"
+    },
+    ONE4APP: {
+      type: "homescreen",
+      ok: "Opening home screen guide…"
     }
   };
 
@@ -1418,12 +1431,32 @@
     $("redeem").classList.remove("on");
   }
 
+  function openHomescreenGuide() {
+    closeRedeem();
+    const ua = navigator.userAgent || "";
+    const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const isAndroid = /Android/i.test(ua);
+    if (isIOS) {
+      $("hsLead").textContent = "iPhone / iPad — Safari";
+      $("hsSteps").innerHTML = "<li>Open <strong>tomasekplays.com</strong> in <strong>Safari</strong>.</li><li>Tap <strong>Share</strong> (square with arrow up).</li><li>Tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong>.</li>";
+    } else if (isAndroid) {
+      $("hsLead").textContent = "Android — Chrome";
+      $("hsSteps").innerHTML = "<li>Open <strong>tomasekplays.com</strong> in <strong>Chrome</strong>.</li><li>Tap <strong>⋮</strong> (top right).</li><li>Tap <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li><li>Confirm.</li>";
+    } else {
+      $("hsLead").textContent = "Phone home screen";
+      $("hsSteps").innerHTML = "<li><strong>iPhone:</strong> Safari → Share → Add to Home Screen.</li><li><strong>Android:</strong> Chrome → ⋮ → Add to Home screen.</li><li>PC download? Redeem <strong>ONE4EXES</strong>.</li>";
+    }
+    $("homescreen").classList.add("on");
+  }
+
   $("brandHome").onclick = (e) => {
     e.preventDefault();
     openRedeem();
   };
   $("redeemCancel").onclick = closeRedeem;
   $("redeem").onclick = (e) => { if (e.target.id === "redeem") closeRedeem(); };
+  $("hsClose").onclick = () => $("homescreen").classList.remove("on");
+  $("homescreen").onclick = (e) => { if (e.target.id === "homescreen") $("homescreen").classList.remove("on"); };
   $("redeemForm").onsubmit = (e) => {
     e.preventDefault();
     const entered = normalizeRedeemCode($("redeemCode").value);
@@ -1446,6 +1479,15 @@
       a.click();
       a.remove();
       setTimeout(closeRedeem, 1200);
+    }
+    if (reward.type === "homescreen") {
+      err.classList.add("ok");
+      err.textContent = reward.ok;
+      $("redeemSubmit").disabled = true;
+      setTimeout(() => {
+        $("redeemSubmit").disabled = false;
+        openHomescreenGuide();
+      }, 350);
     }
     return false;
   };

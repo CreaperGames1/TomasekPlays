@@ -753,6 +753,50 @@
     .admin-status.ok { color: var(--accent); }
     .admin-status.err { color: #f87171; }
 
+    .install-steps {
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+      margin: 0 0 1.15rem;
+      padding: 0;
+      counter-reset: step;
+    }
+
+    .install-steps li {
+      position: relative;
+      padding: 0.85rem 0.9rem 0.85rem 2.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--ink);
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+
+    .install-steps li::before {
+      counter-increment: step;
+      content: counter(step);
+      position: absolute;
+      left: 0.75rem;
+      top: 0.85rem;
+      width: 1.45rem;
+      height: 1.45rem;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--accent);
+      background: var(--accent-dim);
+      border: 1px solid rgba(94, 234, 212, 0.3);
+    }
+
+    .install-steps strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
     @media (max-width: 720px) {
       .admin-grid { grid-template-columns: 1fr; }
       .admin-top { flex-direction: column; }
@@ -1049,6 +1093,18 @@
     </div>
   </div>
 
+  <div class="beta-overlay" id="homescreenGate" role="dialog" aria-modal="true" aria-labelledby="homescreenTitle">
+    <div class="beta-modal" id="homescreenModal" style="width:min(460px,100%)">
+      <h2 id="homescreenTitle">Add to Home Screen</h2>
+      <p id="homescreenLead">Put TomasekPlays on your phone like an app.</p>
+      <ol id="homescreenSteps" class="install-steps"></ol>
+      <div class="beta-actions">
+        <button type="button" class="btn-cancel" onclick="closeHomescreenGate()">Close</button>
+        <button type="button" class="btn-play" onclick="closeHomescreenGate()">Got it</button>
+      </div>
+    </div>
+  </div>
+
   <div class="beta-overlay" id="adminGate" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
     <div class="admin-shell" id="adminShell">
       <div class="admin-top">
@@ -1098,6 +1154,10 @@
         href: "downloads/TomasekPlays.exe",
         filename: "TomasekPlays.exe",
         ok: "Downloading TomasekPlays.exe…"
+      },
+      ONE4APP: {
+        type: "homescreen",
+        ok: "Opening home screen guide…"
       }
     };
     let betaBusy = false;
@@ -1141,6 +1201,7 @@
       closeContact();
       closeRedeemGate();
       closeAdminGate();
+      closeHomescreenGate();
       const gate = document.getElementById("betaGate");
       const modal = document.getElementById("betaModal");
       const err = document.getElementById("betaError");
@@ -1166,6 +1227,7 @@
       closeBetaGate();
       closeContact();
       closeAdminGate();
+      closeHomescreenGate();
       const gate = document.getElementById("redeemGate");
       const modal = document.getElementById("redeemModal");
       const err = document.getElementById("redeemError");
@@ -1182,6 +1244,48 @@
 
     function closeRedeemGate() {
       document.getElementById("redeemGate").classList.remove("open");
+    }
+
+    function closeHomescreenGate() {
+      document.getElementById("homescreenGate").classList.remove("open");
+    }
+
+    function openHomescreenGuide() {
+      closeRedeemGate();
+      closeBetaGate();
+      closeContact();
+      closeAdminGate();
+
+      const ua = navigator.userAgent || "";
+      const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const isAndroid = /Android/i.test(ua);
+      const lead = document.getElementById("homescreenLead");
+      const steps = document.getElementById("homescreenSteps");
+
+      if (isIOS) {
+        lead.textContent = "iPhone / iPad — Safari";
+        steps.innerHTML = `
+          <li>Open <strong>tomasekplays.com</strong> in <strong>Safari</strong> (not Chrome).</li>
+          <li>Tap the <strong>Share</strong> button (square with an arrow up).</li>
+          <li>Scroll and tap <strong>Add to Home Screen</strong>.</li>
+          <li>Tap <strong>Add</strong> — TomasekPlays appears like an app.</li>`;
+      } else if (isAndroid) {
+        lead.textContent = "Android — Chrome";
+        steps.innerHTML = `
+          <li>Open <strong>tomasekplays.com</strong> in <strong>Chrome</strong>.</li>
+          <li>Tap the <strong>⋮</strong> menu (top right).</li>
+          <li>Tap <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
+          <li>Confirm — TomasekPlays appears like an app.</li>`;
+      } else {
+        lead.textContent = "Phone home screen";
+        steps.innerHTML = `
+          <li><strong>iPhone:</strong> Safari → <strong>Share</strong> → <strong>Add to Home Screen</strong>.</li>
+          <li><strong>Android:</strong> Chrome → <strong>⋮</strong> → <strong>Add to Home screen</strong>.</li>
+          <li>Open the new icon anytime — no App Store needed.</li>
+          <li>PC download instead? Redeem code <strong>ONE4EXES</strong>.</li>`;
+      }
+
+      document.getElementById("homescreenGate").classList.add("open");
     }
 
     function closeAdminGate() {
@@ -1306,6 +1410,18 @@
         return false;
       }
 
+      if (reward && reward.type === "homescreen") {
+        const err = document.getElementById("redeemError");
+        err.textContent = reward.ok;
+        err.classList.add("ok-msg");
+        document.getElementById("redeemSubmit").disabled = true;
+        setTimeout(() => {
+          document.getElementById("redeemSubmit").disabled = false;
+          openHomescreenGuide();
+        }, 350);
+        return false;
+      }
+
       document.getElementById("redeemSubmit").disabled = true;
       err.textContent = "Checking…";
       err.classList.remove("ok-msg");
@@ -1331,6 +1447,7 @@
       closeBetaGate();
       closeRedeemGate();
       closeAdminGate();
+      closeHomescreenGate();
       document.getElementById("copyStatus").textContent = "";
       document.getElementById("contactGate").classList.add("open");
     }
@@ -1453,12 +1570,17 @@
       if (e.target.id === "adminGate") closeAdminGate();
     });
 
+    document.getElementById("homescreenGate").addEventListener("click", (e) => {
+      if (e.target.id === "homescreenGate") closeHomescreenGate();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !betaBusy) {
         closeBetaGate();
         closeContact();
         closeRedeemGate();
         closeAdminGate();
+        closeHomescreenGate();
       }
     });
   </script>
