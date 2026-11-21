@@ -28,6 +28,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="season.css" />
   <style>
     :root {
       --bg: #09090b;
@@ -314,6 +315,7 @@
   </style>
 </head>
 <body>
+  <div class="season-fx" id="seasonFx" aria-hidden="true"></div>
   <div class="bg"></div>
   <div class="fx" id="fx" aria-hidden="true"></div>
   <div class="fx-badge" id="fxBadge" aria-hidden="true"></div>
@@ -1406,11 +1408,20 @@
       type: "download",
       href: "downloads/TomasekPlays.exe",
       filename: "TomasekPlays.exe",
-      ok: "Downloading TomasekPlays.exe…"
+      ok: "Downloading TomasekPlays.exe — replace the old file if asked."
     },
     ONE4APP: {
       type: "homescreen",
       ok: "Opening home screen guide…"
+    },
+    CHRISTMAS: {
+      type: "season"
+    },
+    ONE4BETAEXES: {
+      type: "download",
+      href: "downloads/TomasekPlays-Owners.exe",
+      filename: "TomasekPlays-Owners.exe",
+      ok: "Downloading TomasekPlays-Owners.exe — replace the old file if asked."
     }
   };
 
@@ -1483,16 +1494,17 @@
     }
     if (reward.type === "download") {
       err.classList.add("ok");
-      err.textContent = reward.ok;
+      err.textContent = reward.ok || `Downloading ${reward.filename} — replace the old file if asked.`;
       $("redeemSubmit").disabled = true;
       const a = document.createElement("a");
-      a.href = reward.href;
+      const bust = `v=${Date.now()}`;
+      a.href = reward.href + (reward.href.indexOf("?") >= 0 ? "&" : "?") + bust;
       a.download = reward.filename;
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(closeRedeem, 1200);
+      setTimeout(closeRedeem, 1600);
     }
     if (reward.type === "homescreen") {
       err.classList.add("ok");
@@ -1502,6 +1514,22 @@
         $("redeemSubmit").disabled = false;
         openHomescreenGuide();
       }, 350);
+    }
+    if (reward.type === "season") {
+      const season = window.TomasekSeason;
+      const result = season ? season.handleRedeem(entered) : { ok: false, message: "Season module missing." };
+      if (!result || !result.ok) {
+        err.classList.remove("ok");
+        err.textContent = (result && result.message) || "Not available yet.";
+        return false;
+      }
+      err.classList.add("ok");
+      err.textContent = result.message;
+      $("redeemSubmit").disabled = true;
+      setTimeout(() => {
+        $("redeemSubmit").disabled = false;
+        closeRedeem();
+      }, 1400);
     }
     return false;
   };
@@ -1571,5 +1599,6 @@
   });
 })();
 </script>
+<script src="season.js"></script>
 </body>
 </html>
