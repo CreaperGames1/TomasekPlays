@@ -646,6 +646,118 @@
       box-shadow: 0 0 0 1px rgba(94, 234, 212, 0.25), 0 30px 80px rgba(94, 234, 212, 0.2);
     }
 
+    .admin-shell {
+      width: min(920px, 100%);
+      max-height: min(92vh, 900px);
+      overflow: auto;
+      padding: 1.5rem 1.6rem 1.25rem;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background:
+        radial-gradient(ellipse 70% 50% at 10% 0%, rgba(94, 234, 212, 0.12), transparent 55%),
+        linear-gradient(165deg, #141418 0%, var(--bg-elevated) 55%, #0c0c10 100%);
+      box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+      transform: translateY(18px) scale(0.96);
+      opacity: 0;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+    }
+
+    .beta-overlay.open .admin-shell {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    .admin-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .admin-top h2 {
+      font-size: clamp(1.6rem, 3vw, 2.1rem);
+      letter-spacing: -0.04em;
+      margin: 0 0 0.25rem;
+    }
+
+    .admin-top p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+    }
+
+    .admin-block {
+      display: grid;
+      gap: 0.65rem;
+      padding: 1rem 1.05rem;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .admin-block h3 {
+      font-size: 0.95rem;
+      letter-spacing: -0.02em;
+      font-weight: 600;
+    }
+
+    .admin-block label {
+      display: grid;
+      gap: 0.3rem;
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .admin-block input {
+      width: 100%;
+      padding: 0.7rem 0.8rem;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: rgba(0, 0, 0, 0.35);
+      color: var(--ink);
+      font-family: var(--font);
+      font-size: 0.95rem;
+    }
+
+    .admin-block input:focus {
+      outline: none;
+      border-color: rgba(94, 234, 212, 0.55);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    .admin-block .btn-play {
+      justify-self: start;
+      margin-top: 0.15rem;
+    }
+
+    .admin-status {
+      min-height: 1.25rem;
+      margin-top: 1rem;
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .admin-status.ok { color: var(--accent); }
+    .admin-status.err { color: #f87171; }
+
+    @media (max-width: 720px) {
+      .admin-grid { grid-template-columns: 1fr; }
+      .admin-top { flex-direction: column; }
+    }
+
     @keyframes modalShake {
       0%, 100% { transform: translateX(0); }
       20% { transform: translateX(-8px); }
@@ -914,10 +1026,49 @@
     </div>
   </div>
 
+  <div class="beta-overlay" id="adminGate" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+    <div class="admin-shell" id="adminShell">
+      <div class="admin-top">
+        <div>
+          <h2 id="adminTitle">Courier Town</h2>
+          <p>Remote control — live servers</p>
+        </div>
+        <button type="button" class="btn-cancel" onclick="closeAdminGate()">Close</button>
+      </div>
+      <div class="admin-grid">
+        <section class="admin-block">
+          <h3>Announce</h3>
+          <label>Message <input id="adminAnnounce" maxlength="200" placeholder="Message to all players" /></label>
+          <button type="button" class="btn-play" onclick="adminSend('announce')">Send</button>
+        </section>
+        <section class="admin-block">
+          <h3>Kick</h3>
+          <label>Username <input id="adminKickUser" maxlength="40" placeholder="Player username" /></label>
+          <label>Reason <input id="adminKickReason" maxlength="120" placeholder="Optional" /></label>
+          <button type="button" class="btn-play" onclick="adminSend('kick')">Kick</button>
+        </section>
+        <section class="admin-block">
+          <h3>Give cash</h3>
+          <label>Username <input id="adminCashUser" maxlength="40" placeholder="Player username" /></label>
+          <label>Amount <input id="adminCashAmount" type="number" min="1" max="1000000" placeholder="1000" /></label>
+          <button type="button" class="btn-play" onclick="adminSend('giveCash')">Give</button>
+        </section>
+        <section class="admin-block">
+          <h3>Restart servers</h3>
+          <p style="margin:0;color:var(--muted);font-size:0.9rem;line-height:1.45">Soft-restarts all live Courier Town servers.</p>
+          <button type="button" class="btn-play" onclick="adminSend('restart')">Restart</button>
+        </section>
+      </div>
+      <p class="admin-status" id="adminStatus" aria-live="polite"></p>
+    </div>
+  </div>
+
   <script>
     const BETA_CODES = ["4949", "148", "312"];
     const BETA_KEY = "tomasekBetaUnlocked";
     const CONTACT_EMAIL = "tomasekplays.business@outlook.com";
+    const ADMIN_API = "https://tomasekplays-admin.tomasekplays.workers.dev";
+    const ADMIN_TOKEN_KEY = "tomasekAdminToken";
     const REDEEM_CODES = {
       ONE4EXES: {
         type: "download",
@@ -927,6 +1078,7 @@
       }
     };
     let betaBusy = false;
+    let adminBusy = false;
 
     function detectDevice() {
       const ua = navigator.userAgent || "";
@@ -965,6 +1117,7 @@
       }
       closeContact();
       closeRedeemGate();
+      closeAdminGate();
       const gate = document.getElementById("betaGate");
       const modal = document.getElementById("betaModal");
       const err = document.getElementById("betaError");
@@ -989,6 +1142,7 @@
       if (betaBusy) return;
       closeBetaGate();
       closeContact();
+      closeAdminGate();
       const gate = document.getElementById("redeemGate");
       const modal = document.getElementById("redeemModal");
       const err = document.getElementById("redeemError");
@@ -1005,6 +1159,15 @@
 
     function closeRedeemGate() {
       document.getElementById("redeemGate").classList.remove("open");
+    }
+
+    function closeAdminGate() {
+      const gate = document.getElementById("adminGate");
+      if (gate) gate.classList.remove("open");
+    }
+
+    function openAdminGate() {
+      window.location.href = "controller.html";
     }
 
     function runRedeemDownload(reward) {
@@ -1028,6 +1191,84 @@
       setTimeout(() => closeRedeemGate(), 1200);
     }
 
+    async function tryAdminAuth(code) {
+      if (!ADMIN_API) {
+        return { ok: false, reason: "not_configured" };
+      }
+      try {
+        const res = await fetch(`${ADMIN_API.replace(/\/$/, "")}/auth`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.token) {
+          return { ok: false, reason: "wrong_code" };
+        }
+        sessionStorage.setItem(ADMIN_TOKEN_KEY, data.token);
+        return { ok: true };
+      } catch (_) {
+        return { ok: false, reason: "network" };
+      }
+    }
+
+    async function adminSend(action) {
+      if (adminBusy) return;
+      const status = document.getElementById("adminStatus");
+      const token = sessionStorage.getItem(ADMIN_TOKEN_KEY);
+      if (!ADMIN_API || !token) {
+        status.className = "admin-status err";
+        status.textContent = "Session expired. Redeem the code again.";
+        return;
+      }
+
+      const body = { action };
+      if (action === "announce") {
+        body.text = document.getElementById("adminAnnounce").value.trim();
+      } else if (action === "kick") {
+        body.target = document.getElementById("adminKickUser").value.trim();
+        body.text = document.getElementById("adminKickReason").value.trim();
+      } else if (action === "giveCash") {
+        body.target = document.getElementById("adminCashUser").value.trim();
+        body.amount = Number(document.getElementById("adminCashAmount").value);
+      } else if (action === "restart") {
+        if (!confirm("Restart all Courier Town servers?")) return;
+      }
+
+      adminBusy = true;
+      status.className = "admin-status";
+      status.textContent = "Sending…";
+      try {
+        const res = await fetch(`${ADMIN_API.replace(/\/$/, "")}/command`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          status.className = "admin-status err";
+          status.textContent = data.error === "unknown_user"
+            ? "Player not found."
+            : data.error === "unauthorized"
+              ? "Session expired. Redeem again."
+              : `Failed (${data.error || res.status}).`;
+          return;
+        }
+        status.className = "admin-status ok";
+        status.textContent = action === "restart"
+          ? "Restart requested."
+          : "Sent to live servers.";
+      } catch (_) {
+        status.className = "admin-status err";
+        status.textContent = "Network error.";
+      } finally {
+        adminBusy = false;
+      }
+    }
+
     function submitRedeem(event) {
       event.preventDefault();
       if (betaBusy) return false;
@@ -1037,18 +1278,28 @@
       const entered = normalizeRedeemCode(document.getElementById("redeemCode").value);
       const reward = REDEEM_CODES[entered];
 
-      if (!reward) {
-        err.textContent = "Wrong code. Try again.";
-        err.classList.remove("ok-msg");
-        modal.classList.remove("shake");
-        void modal.offsetWidth;
-        modal.classList.add("shake");
+      if (reward && reward.type === "download") {
+        runRedeemDownload(reward);
         return false;
       }
 
-      if (reward.type === "download") {
-        runRedeemDownload(reward);
-      }
+      document.getElementById("redeemSubmit").disabled = true;
+      err.textContent = "Checking…";
+      err.classList.remove("ok-msg");
+      tryAdminAuth(entered).then((result) => {
+        document.getElementById("redeemSubmit").disabled = false;
+        if (result.ok) {
+          err.textContent = "Access granted.";
+          err.classList.add("ok-msg");
+          setTimeout(() => openAdminGate(), 350);
+          return;
+        }
+        err.classList.remove("ok-msg");
+        err.textContent = "Wrong code. Try again.";
+        modal.classList.remove("shake");
+        void modal.offsetWidth;
+        modal.classList.add("shake");
+      });
       return false;
     }
 
@@ -1056,6 +1307,7 @@
       if (betaBusy) return;
       closeBetaGate();
       closeRedeemGate();
+      closeAdminGate();
       document.getElementById("copyStatus").textContent = "";
       document.getElementById("contactGate").classList.add("open");
     }
@@ -1144,11 +1396,16 @@
       if (e.target.id === "redeemGate") closeRedeemGate();
     });
 
+    document.getElementById("adminGate").addEventListener("click", (e) => {
+      if (e.target.id === "adminGate") closeAdminGate();
+    });
+
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape" && !betaBusy) {
         closeBetaGate();
         closeContact();
         closeRedeemGate();
+        closeAdminGate();
       }
     });
   </script>
