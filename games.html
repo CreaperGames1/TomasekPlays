@@ -425,12 +425,12 @@
 
   <div class="overlay" id="downloadHelp">
     <div class="card" style="width:min(480px,100%)">
-      <h1>Download started</h1>
-      <p>Official TomasekPlays app from this site. Windows may warn because it is a new publisher — that is normal.</p>
+      <h1>Owners download</h1>
+      <p>Owners build only — Windows SmartScreen may warn. That is expected for this file.</p>
       <ol style="margin:0 0 1rem;padding-left:1.2rem;color:var(--ink);line-height:1.55;display:grid;gap:.55rem">
-        <li>Open the downloaded <strong id="dlHelpFile">TomasekPlays.exe</strong>.</li>
+        <li>Open the downloaded <strong id="dlHelpFile">TomasekPlays-Owners.exe</strong>.</li>
         <li>If you see <strong>Windows protected your PC</strong> → click <strong>More info</strong> → <strong>Run anyway</strong>.</li>
-        <li>If your browser says the file is uncommon → keep / open anyway (it came from tomasekplays.com).</li>
+        <li>If your browser says the file is uncommon → keep / open anyway.</li>
       </ol>
       <button type="button" class="btn btn-a" id="dlHelpClose">Got it</button>
     </div>
@@ -1421,7 +1421,8 @@
       type: "download",
       href: "https://tomasekplays.com/downloads/TomasekPlays.exe",
       filename: "TomasekPlays.exe",
-      ok: "Download started — see the Windows tip if SmartScreen appears."
+      ok: "Downloading TomasekPlays.exe…",
+      noReplace: true
     },
     ONE4APP: {
       type: "homescreen",
@@ -1434,7 +1435,8 @@
       type: "download",
       href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.exe",
       filename: "TomasekPlays-Owners.exe",
-      ok: "Owners download started — see the Windows tip if SmartScreen appears."
+      ok: "Owners download started — see the Windows tip if SmartScreen appears.",
+      smartScreenHelp: true
     }
   };
 
@@ -1519,17 +1521,28 @@
       err.textContent = reward.ok || `Downloading ${reward.filename}…`;
       $("redeemSubmit").disabled = true;
       const a = document.createElement("a");
-      const bust = `v=${Date.now()}`;
-      a.href = reward.href + (reward.href.indexOf("?") >= 0 ? "&" : "?") + bust;
+      if (reward.noReplace) {
+        a.href = reward.href;
+      } else {
+        const bust = `v=${Date.now()}`;
+        a.href = reward.href + (reward.href.indexOf("?") >= 0 ? "&" : "?") + bust;
+      }
       a.download = reward.filename;
       a.rel = "noopener";
       document.body.appendChild(a);
       a.click();
       a.remove();
-      setTimeout(() => {
-        $("redeemSubmit").disabled = false;
-        openDownloadHelp(reward.filename);
-      }, 700);
+      if (reward.smartScreenHelp) {
+        setTimeout(() => {
+          $("redeemSubmit").disabled = false;
+          openDownloadHelp(reward.filename);
+        }, 700);
+      } else {
+        setTimeout(() => {
+          $("redeemSubmit").disabled = false;
+          closeRedeem();
+        }, 1600);
+      }
     }
     if (reward.type === "homescreen") {
       err.classList.add("ok");
