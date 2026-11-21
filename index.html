@@ -1456,6 +1456,9 @@
           modal.classList.remove("shake");
           void modal.offsetWidth;
           modal.classList.add("shake");
+          if (result && result.wait) {
+            setTimeout(() => closeRedeemGate(), 400);
+          }
           return false;
         }
         err.textContent = result.message;

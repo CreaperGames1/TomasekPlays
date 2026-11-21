@@ -246,3 +246,84 @@ body.theme-christmas .grid-fade {
   font-size: 0.95rem;
   cursor: pointer;
 }
+
+/* Christmas early-redeem wait + countdown */
+.xmas-wait {
+  position: fixed;
+  inset: 0;
+  z-index: 420;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(5, 10, 8, 0.82);
+  backdrop-filter: blur(12px);
+}
+.xmas-wait.on { display: flex; }
+.xmas-wait .box {
+  width: min(440px, 100%);
+  padding: 1.75rem 1.6rem 1.4rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 107, 107, 0.28);
+  background:
+    radial-gradient(ellipse 70% 50% at 80% 0%, rgba(255, 107, 107, 0.14), transparent 55%),
+    linear-gradient(165deg, #14201a 0%, #111114 55%, #0c0c10 100%);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+  text-align: center;
+}
+.xmas-wait h2 {
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.4rem;
+}
+.xmas-wait .msg {
+  color: #f87171;
+  font-size: 0.95rem;
+  margin: 0 0 1.15rem;
+  line-height: 1.45;
+}
+.xmas-wait .timer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 1.15rem;
+}
+.xmas-wait .unit {
+  padding: 0.7rem 0.35rem;
+  border-radius: 12px;
+  border: 1px solid rgba(244, 244, 240, 0.1);
+  background: rgba(0, 0, 0, 0.28);
+}
+.xmas-wait .unit b {
+  display: block;
+  font-size: clamp(1.2rem, 4vw, 1.55rem);
+  letter-spacing: -0.03em;
+  color: #7dffb3;
+  font-variant-numeric: tabular-nums;
+}
+.xmas-wait .unit span {
+  display: block;
+  margin-top: 0.2rem;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 240, 0.5);
+}
+.xmas-wait .sub {
+  color: rgba(244, 244, 240, 0.5);
+  font-size: 0.82rem;
+  margin: 0 0 1rem;
+}
+.xmas-wait button {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border: none;
+  border-radius: 999px;
+  background: #f4f4f0;
+  color: #09090b;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  font-family: inherit;
+}

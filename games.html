@@ -1521,6 +1521,7 @@
       if (!result || !result.ok) {
         err.classList.remove("ok");
         err.textContent = (result && result.message) || "Not available yet.";
+        if (result && result.wait) setTimeout(closeRedeem, 400);
         return false;
       }
       err.classList.add("ok");
