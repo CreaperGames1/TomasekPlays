@@ -1082,7 +1082,7 @@
       <form class="beta-fields" id="redeemForm" autocomplete="off" onsubmit="return submitRedeem(event)">
         <label>
           Code
-          <input id="redeemCode" name="code" maxlength="32" placeholder="CODE IN CAPS" autocapitalize="characters" spellcheck="false" required />
+          <input id="redeemCode" name="code" maxlength="32" placeholder="Enter code" autocapitalize="characters" autocomplete="off" spellcheck="false" required style="text-transform:uppercase" />
         </label>
         <p class="beta-error" id="redeemError" aria-live="polite"></p>
         <div class="beta-actions">
@@ -1189,13 +1189,18 @@
     window.addEventListener("orientationchange", () => { applyDevice(); });
 
     function normalizeRedeemCode(raw) {
-      // Keep letters as typed — redeem codes only work in CAPITALS
-      return String(raw || "").replace(/[^A-Za-z0-9]/g, "");
+      return String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
     }
 
-    function isCapsRedeemCode(raw) {
-      const cleaned = normalizeRedeemCode(raw);
-      return cleaned.length > 0 && !/[a-z]/.test(cleaned);
+    function forceRedeemCaps(input) {
+      if (!input) return;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+      const next = String(input.value || "").toUpperCase();
+      if (input.value !== next) {
+        input.value = next;
+        try { input.setSelectionRange(start, end); } catch (_) {}
+      }
     }
 
     function openBetaGate() {
@@ -1408,22 +1413,9 @@
 
       const modal = document.getElementById("redeemModal");
       const err = document.getElementById("redeemError");
-      const raw = document.getElementById("redeemCode").value;
-      const entered = normalizeRedeemCode(raw);
-
-      function redeemFail(msg) {
-        err.textContent = msg || "Wrong code. Try again.";
-        err.classList.remove("ok-msg");
-        modal.classList.remove("shake");
-        void modal.offsetWidth;
-        modal.classList.add("shake");
-      }
-
-      if (!isCapsRedeemCode(raw)) {
-        redeemFail("Use CAPITAL letters only.");
-        return false;
-      }
-
+      const input = document.getElementById("redeemCode");
+      forceRedeemCaps(input);
+      const entered = normalizeRedeemCode(input.value);
       const reward = REDEEM_CODES[entered];
 
       if (reward && reward.type === "download") {
@@ -1453,10 +1445,22 @@
           setTimeout(() => openAdminGate(), 350);
           return;
         }
-        redeemFail("Wrong code. Try again.");
+        err.classList.remove("ok-msg");
+        err.textContent = "Wrong code. Try again.";
+        modal.classList.remove("shake");
+        void modal.offsetWidth;
+        modal.classList.add("shake");
       });
       return false;
     }
+
+    (function bindRedeemCaps() {
+      const input = document.getElementById("redeemCode");
+      if (!input) return;
+      const bump = () => forceRedeemCaps(input);
+      input.addEventListener("input", bump);
+      input.addEventListener("blur", bump);
+    })();
 
     function openContact() {
       if (betaBusy) return;

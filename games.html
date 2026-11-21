@@ -402,7 +402,7 @@
       <h1>Redeem</h1>
       <p>Enter a code.</p>
       <form id="redeemForm">
-        <label class="f">Code <input id="redeemCode" maxlength="32" placeholder="CODE IN CAPS" autocomplete="off" autocapitalize="characters" spellcheck="false" required /></label>
+        <label class="f">Code <input id="redeemCode" maxlength="32" placeholder="Enter code" autocomplete="off" autocapitalize="characters" spellcheck="false" required style="text-transform:uppercase" /></label>
         <p class="err" id="redeemErr"></p>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap">
           <button type="button" class="btn btn-g" id="redeemCancel" style="flex:1">Cancel</button>
@@ -1415,13 +1415,18 @@
   };
 
   function normalizeRedeemCode(raw) {
-    // Keep letters as typed — redeem codes only work in CAPITALS
-    return String(raw || "").replace(/[^A-Za-z0-9]/g, "");
+    return String(raw || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
   }
 
-  function isCapsRedeemCode(raw) {
-    const cleaned = normalizeRedeemCode(raw);
-    return cleaned.length > 0 && !/[a-z]/.test(cleaned);
+  function forceRedeemCaps(input) {
+    if (!input) return;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const next = String(input.value || "").toUpperCase();
+    if (input.value !== next) {
+      input.value = next;
+      try { input.setSelectionRange(start, end); } catch (_) {}
+    }
   }
 
   function openRedeem() {
@@ -1463,17 +1468,14 @@
   $("redeem").onclick = (e) => { if (e.target.id === "redeem") closeRedeem(); };
   $("hsClose").onclick = () => $("homescreen").classList.remove("on");
   $("homescreen").onclick = (e) => { if (e.target.id === "homescreen") $("homescreen").classList.remove("on"); };
+  $("redeemCode").addEventListener("input", () => forceRedeemCaps($("redeemCode")));
+  $("redeemCode").addEventListener("blur", () => forceRedeemCaps($("redeemCode")));
   $("redeemForm").onsubmit = (e) => {
     e.preventDefault();
-    const raw = $("redeemCode").value;
-    const entered = normalizeRedeemCode(raw);
+    forceRedeemCaps($("redeemCode"));
+    const entered = normalizeRedeemCode($("redeemCode").value);
     const reward = REDEEM_CODES[entered];
     const err = $("redeemErr");
-    if (!isCapsRedeemCode(raw)) {
-      err.classList.remove("ok");
-      err.textContent = "Use CAPITAL letters only.";
-      return false;
-    }
     if (!reward) {
       err.classList.remove("ok");
       err.textContent = "Wrong code. Try again.";
