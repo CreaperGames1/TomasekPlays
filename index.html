@@ -915,8 +915,8 @@
       100% { opacity: 0; transform: translate(-50%, -60%) scale(1); }
     }
 
-    /* Arcade stays on tomasekplays.com — games.html never shows in the address bar */
-    .play-frame {
+    /* Hidden apps — address bar always stays on tomasekplays.com */
+    .app-frame {
       position: fixed;
       inset: 0;
       width: 100%;
@@ -927,19 +927,19 @@
       display: none;
     }
 
-    body.playing .play-frame { display: block; }
-    body.playing .atmosphere,
-    body.playing .grid-fade,
-    body.playing .wrap,
-    body.playing .unlock-flash,
-    body.playing .unlock-badge,
-    body.playing .beta-overlay {
+    body.app-open .app-frame { display: block; }
+    body.app-open .atmosphere,
+    body.app-open .grid-fade,
+    body.app-open .wrap,
+    body.app-open .unlock-flash,
+    body.app-open .unlock-badge,
+    body.app-open .beta-overlay {
       display: none !important;
     }
   </style>
 </head>
 <body>
-  <iframe class="play-frame" id="playFrame" title="TomasekPlays Arcade" src="about:blank" allow="fullscreen; gamepad; autoplay"></iframe>
+  <iframe class="app-frame" id="appFrame" title="TomasekPlays" src="about:blank" allow="fullscreen; gamepad; autoplay"></iframe>
   <div class="atmosphere" aria-hidden="true"></div>
   <div class="grid-fade" aria-hidden="true"></div>
 
@@ -1190,7 +1190,7 @@
     }
 
     function openAdminGate() {
-      window.location.href = "controller.html";
+      openHiddenApp("controller.html");
     }
 
     function runRedeemDownload(reward) {
@@ -1354,16 +1354,17 @@
       }
     }
 
-    function openArcadeHidden() {
-      const frame = document.getElementById("playFrame");
-      // Load arcade inside the home page so the URL stays tomasekplays.com
-      if (frame.getAttribute("src") !== "games.html") {
-        frame.src = "games.html";
-      }
-      document.body.classList.add("playing");
+    function keepHomeUrl() {
       if (location.protocol.startsWith("http")) {
         history.replaceState(null, "", "/");
       }
+    }
+
+    function openHiddenApp(page) {
+      const frame = document.getElementById("appFrame");
+      if (frame.getAttribute("src") !== page) frame.src = page;
+      document.body.classList.add("app-open");
+      keepHomeUrl();
     }
 
     function playUnlockThenGo() {
@@ -1388,15 +1389,23 @@
       badge.classList.add("go");
 
       setTimeout(() => {
-        openArcadeHidden();
+        openHiddenApp("games.html");
         betaBusy = false;
       }, 900);
     }
 
-    // Already unlocked this session → open arcade without exposing /games.html
-    if (sessionStorage.getItem(BETA_KEY) === "1") {
-      openArcadeHidden();
-    }
+    // Bounce targets from direct /games.html or /controller.html visits
+    try {
+      if (sessionStorage.getItem("tomasekOpenController") === "1") {
+        sessionStorage.removeItem("tomasekOpenController");
+        if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) openHiddenApp("controller.html");
+      } else if (sessionStorage.getItem("tomasekOpenArcade") === "1") {
+        sessionStorage.removeItem("tomasekOpenArcade");
+        if (sessionStorage.getItem(BETA_KEY) === "1") openHiddenApp("games.html");
+      } else if (sessionStorage.getItem(BETA_KEY) === "1") {
+        openHiddenApp("games.html");
+      }
+    } catch (_) {}
 
     function submitBeta(event) {
       event.preventDefault();

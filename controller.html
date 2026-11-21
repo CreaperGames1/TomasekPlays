@@ -6,6 +6,25 @@
   <title>Controller — TomasekPlays</title>
   <meta name="robots" content="noindex, nofollow" />
   <link rel="icon" href="logo.png" type="image/png" />
+  <script>
+    // Never stay on /controller.html in the address bar — bounce to home.
+    (function () {
+      try {
+        if (window.top === window) {
+          if (sessionStorage.getItem("tomasekAdminToken")) {
+            sessionStorage.setItem("tomasekOpenController", "1");
+          }
+          location.replace("index.html");
+          return;
+        }
+        if (!sessionStorage.getItem("tomasekAdminToken")) {
+          window.top.location.replace("index.html");
+        }
+      } catch (_) {
+        location.replace("index.html");
+      }
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -352,14 +371,14 @@
 
   <div class="wrap">
     <header class="nav">
-      <a class="brand" href="index.html">
+      <a class="brand" href="#" id="brandHome">
         <img src="logo.png" alt="" width="40" height="40" />
         TomasekPlays
       </a>
       <div class="nav-actions">
         <span class="pill" id="livePill">Locked</span>
         <button type="button" class="btn btn-ghost" id="btnLock" hidden>Lock</button>
-        <a class="btn btn-ghost" href="index.html">Home</a>
+        <button type="button" class="btn btn-ghost" id="btnHome">Home</button>
       </div>
     </header>
 
@@ -448,7 +467,7 @@
         </label>
         <p class="gate-err" id="gateErr" aria-live="polite"></p>
         <div class="gate-actions">
-          <a class="btn btn-ghost" href="index.html">Cancel</a>
+          <button type="button" class="btn btn-ghost" id="gateCancel">Cancel</button>
           <button type="submit" class="btn btn-accent" id="gateSubmit">Unlock</button>
         </div>
       </form>
@@ -493,16 +512,16 @@
       livePill.textContent = "Unlocked";
     }
 
-    function showLocked() {
+    function goHomeTop() {
       setToken("");
-      gate.hidden = false;
-      controls.hidden = true;
-      btnLock.hidden = true;
-      livePill.textContent = "Locked";
-      setStatus("");
-      document.getElementById("gateCode").value = "";
-      document.getElementById("gateErr").textContent = "";
-      document.getElementById("gateErr").className = "gate-err";
+      try { sessionStorage.removeItem("tomasekOpenController"); } catch (_) {}
+      const target = "index.html";
+      if (window.top && window.top !== window) window.top.location.href = target;
+      else window.location.href = target;
+    }
+
+    function showLocked() {
+      goHomeTop();
     }
 
     async function unlock(code) {
@@ -571,7 +590,13 @@
       }
     });
 
-    btnLock.addEventListener("click", () => showLocked());
+    btnLock.addEventListener("click", () => goHomeTop());
+    document.getElementById("btnHome").addEventListener("click", () => goHomeTop());
+    document.getElementById("brandHome").addEventListener("click", (e) => {
+      e.preventDefault();
+      goHomeTop();
+    });
+    document.getElementById("gateCancel").addEventListener("click", () => goHomeTop());
 
     document.querySelectorAll("[data-action]").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -623,13 +648,12 @@
       });
     });
 
-    // Auto-unlock if redeem on the home page already stored a token
+    // Opened from home redeem (token already stored) — never keep /controller.html visible
     if (getToken()) {
       showUnlocked();
       setStatus("Session restored.", "ok");
     } else {
-      showLocked();
-      setTimeout(() => document.getElementById("gateCode").focus(), 200);
+      goHomeTop();
     }
   </script>
 </body>

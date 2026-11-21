@@ -7,11 +7,18 @@
   <title>Arcade · Tomasek Plays</title>
   <link rel="icon" href="logo.png" type="image/png" />
   <script>
-    // Keep arcade off the public URL — only open after beta unlock from the home page.
+    // Never stay on /games.html in the address bar — always bounce to home (iframe or redirect).
     (function () {
       try {
-        if (sessionStorage.getItem("tomasekBetaUnlocked") !== "1") {
+        if (window.top === window) {
+          if (sessionStorage.getItem("tomasekBetaUnlocked") === "1") {
+            sessionStorage.setItem("tomasekOpenArcade", "1");
+          }
           location.replace("index.html");
+          return;
+        }
+        if (sessionStorage.getItem("tomasekBetaUnlocked") !== "1") {
+          window.top.location.replace("index.html");
         }
       } catch (_) {
         location.replace("index.html");
