@@ -978,8 +978,12 @@
     body.app-open .wrap,
     body.app-open .unlock-flash,
     body.app-open .unlock-badge,
-    body.app-open .beta-overlay {
+    body.app-open .beta-overlay:not(#adminGate) {
       display: none !important;
+    }
+    /* Admin GUI sits above the arcade iframe */
+    body.app-open #adminGate {
+      z-index: 300;
     }
   </style>
 </head>
@@ -1354,7 +1358,12 @@
       closeContact();
       closeHomescreenGate();
       closeDownloadHelp();
-      openHiddenApp("contr0l2er9.html");
+      const status = document.getElementById("adminStatus");
+      if (status) {
+        status.textContent = "";
+        status.className = "admin-status";
+      }
+      document.getElementById("adminGate").classList.add("open");
     }
 
     function runRedeemDownload(reward) {
@@ -1617,10 +1626,10 @@
       keepHomeUrl();
     }
 
-    // Arcade (iframe) redeems the controller code and asks the home page to open it.
+    // Arcade redeem can open the on-page admin GUI (same as home Redeem).
     window.addEventListener("message", (e) => {
       if (e.origin !== location.origin) return;
-      if (!e.data || e.data.type !== "tomasekOpenController") return;
+      if (!e.data || e.data.type !== "tomasekOpenAdmin") return;
       if (sessionStorage.getItem(ADMIN_TOKEN_KEY)) openAdminGate();
     });
 

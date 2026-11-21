@@ -1530,7 +1530,7 @@
     const reward = REDEEM_CODES[entered];
     const err = $("redeemErr");
     if (!reward) {
-      // Controller / admin code — unlock via webhook, then ask the home page to open it.
+      // Admin code — unlock via webhook, then open the home-page admin GUI.
       $("redeemSubmit").disabled = true;
       err.classList.remove("ok");
       err.textContent = "Checking…";
@@ -1543,7 +1543,7 @@
             closeRedeem();
             try {
               if (window.top && window.top !== window) {
-                window.top.postMessage({ type: "tomasekOpenController" }, location.origin);
+                window.top.postMessage({ type: "tomasekOpenAdmin" }, location.origin);
               }
             } catch (_) {}
           }, 350);
