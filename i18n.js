@@ -587,8 +587,9 @@
 
   function initLang() {
     const stored = loadSettings().lang;
-    lang = stored ? normalize(stored) : detectLang();
-    if (!stored) saveSettings({ lang });
+    // Always start in English unless the user picked a language in Settings.
+    lang = stored ? normalize(stored) : DEFAULT;
+    if (!stored) saveSettings({ lang: DEFAULT });
   }
 
   function t(key, vars) {
