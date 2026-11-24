@@ -325,14 +325,14 @@
       <div class="card">
         <div class="brand-row">
           <img src="logo.png" alt="" />
-          <div><strong>Tomasek Plays</strong><div style="color:var(--muted);font-size:.8rem">Arcade beta</div></div>
+          <div><strong>Tomasek Plays</strong><div style="color:var(--muted);font-size:.8rem" data-i18n="beta.arcadeTag">Arcade beta</div></div>
         </div>
-        <h1>Try Beta mode</h1>
-        <p>Enter a beta code to unlock the arcade.</p>
+        <h1 data-i18n="beta.title">Try Beta mode</h1>
+        <p data-i18n="beta.arcadeLead">Enter a beta code to unlock the arcade.</p>
         <form id="betaForm">
-          <label class="f">Beta code <input id="betaCode" maxlength="8" inputmode="numeric" placeholder="Enter code" autocomplete="off" required /></label>
+          <label class="f"><span data-i18n="beta.label">Beta code</span> <input id="betaCode" maxlength="8" inputmode="numeric" placeholder="Enter code" data-i18n-placeholder="beta.placeholder" autocomplete="off" required /></label>
           <p class="err" id="betaErr"></p>
-          <button class="btn btn-a" type="submit">Try Beta mode</button>
+          <button class="btn btn-a" type="submit" data-i18n="beta.submit">Try Beta mode</button>
         </form>
       </div>
     </div>
@@ -341,14 +341,14 @@
   <section class="screen" id="device">
     <div class="gate">
       <div class="card">
-        <h1>Choose your setup</h1>
-        <p>Auto-detects phone or PC. You can override here anytime.</p>
+        <h1 data-i18n="device.title">Choose your setup</h1>
+        <p data-i18n="device.lead">Auto-detects phone or PC. You can override here anytime.</p>
         <div class="devs">
-          <button type="button" class="dev on" data-d="pc"><strong>PC</strong><span>Keyboard · zoom ok</span></button>
-          <button type="button" class="dev" data-d="mobile"><strong>Mobile</strong><span>Touch · zoom off</span></button>
+          <button type="button" class="dev on" data-d="pc"><strong data-i18n="device.pcStrong">PC</strong><span data-i18n="device.pcHint">Keyboard · zoom ok</span></button>
+          <button type="button" class="dev" data-d="mobile"><strong data-i18n="device.mobileStrong">Mobile</strong><span data-i18n="device.mobileHint">Touch · zoom off</span></button>
         </div>
-        <button type="button" class="btn btn-a" id="goArcade">Enter arcade</button>
-        <div style="margin-top:.7rem"><button type="button" class="btn btn-g" id="btnHomeDevice" style="width:100%">Back home</button></div>
+        <button type="button" class="btn btn-a" id="goArcade" data-i18n="device.enter">Enter arcade</button>
+        <div style="margin-top:.7rem"><button type="button" class="btn btn-g" id="btnHomeDevice" style="width:100%" data-i18n="device.backHome">Back home</button></div>
       </div>
     </div>
   </section>
@@ -363,15 +363,15 @@
           <a href="/" id="brandHome">TomasekPlays</a>
         </div>
         <div class="nav-r">
-          <span class="chip">device <b id="devChip">PC</b></span>
-          <button type="button" class="ico" id="btnSet1" title="Settings">⚙</button>
-          <button type="button" class="btn btn-g" id="btnSwitch" style="padding:.5rem .85rem;font-size:.82rem">Switch device</button>
-          <button type="button" class="btn-home" id="btnHome">← Home</button>
+          <span class="chip"><span data-i18n="hub.device">device</span> <b id="devChip">PC</b></span>
+          <button type="button" class="ico" id="btnSet1" title="Settings" data-i18n-title="nav.settings">⚙</button>
+          <button type="button" class="btn btn-g" id="btnSwitch" style="padding:.5rem .85rem;font-size:.82rem" data-i18n="hub.switch">Switch device</button>
+          <button type="button" class="btn-home" id="btnHome" data-i18n="hub.home">← Home</button>
         </div>
       </header>
       <div class="head">
-        <h2>Pick a game. Play here.</h2>
-        <p>Everything runs on this page — tap a card to start.</p>
+        <h2 data-i18n="hub.title">Pick a game. Play here.</h2>
+        <p data-i18n="hub.lead">Everything runs on this page — tap a card to start.</p>
       </div>
       <div class="grid" id="grid"></div>
     </div>
@@ -380,15 +380,15 @@
   <section class="screen" id="player">
     <div class="pbar">
       <div style="display:flex;gap:.5rem;align-items:center;flex-wrap:wrap">
-        <button type="button" class="btn btn-g" id="btnBack" style="padding:.45rem .8rem;font-size:.85rem">← Arcade</button>
-        <button type="button" class="btn-home" id="btnHomePlay" style="padding:.45rem .8rem;font-size:.85rem">← Home</button>
+        <button type="button" class="btn btn-g" id="btnBack" style="padding:.45rem .8rem;font-size:.85rem" data-i18n="player.arcade">← Arcade</button>
+        <button type="button" class="btn-home" id="btnHomePlay" style="padding:.45rem .8rem;font-size:.85rem" data-i18n="player.home">← Home</button>
         <strong id="pTitle">Game</strong>
       </div>
       <div style="display:flex;gap:.45rem;align-items:center;flex-wrap:wrap">
-        <span class="pill">score <b id="score">0</b></span>
-        <span class="pill">best <b id="best">0</b></span>
-        <button type="button" class="ico" id="btnSet2">⚙</button>
-        <button type="button" class="btn btn-a" id="btnRestart" style="width:auto;padding:.45rem .9rem;font-size:.85rem">Restart</button>
+        <span class="pill"><span data-i18n="player.score">score</span> <b id="score">0</b></span>
+        <span class="pill"><span data-i18n="player.best">best</span> <b id="best">0</b></span>
+        <button type="button" class="ico" id="btnSet2" title="Settings" data-i18n-title="nav.settings">⚙</button>
+        <button type="button" class="btn btn-a" id="btnRestart" style="width:auto;padding:.45rem .9rem;font-size:.85rem" data-i18n="player.restart">Restart</button>
       </div>
     </div>
     <div class="stage">
@@ -401,14 +401,14 @@
 
   <div class="overlay" id="redeem">
     <div class="card" style="width:min(440px,100%)">
-      <h1>Redeem</h1>
-      <p>Enter a code.</p>
+      <h1 data-i18n="redeem.title">Redeem</h1>
+      <p data-i18n="redeem.lead">Enter a code.</p>
       <form id="redeemForm">
-        <label class="f">Code <input id="redeemCode" maxlength="32" placeholder="Enter code" autocomplete="off" autocapitalize="characters" spellcheck="false" required style="text-transform:uppercase" /></label>
+        <label class="f"><span data-i18n="redeem.label">Code</span> <input id="redeemCode" maxlength="32" placeholder="Enter code" data-i18n-placeholder="redeem.placeholder" autocomplete="off" autocapitalize="characters" spellcheck="false" required style="text-transform:uppercase" /></label>
         <p class="err" id="redeemErr"></p>
         <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-          <button type="button" class="btn btn-g" id="redeemCancel" style="flex:1">Cancel</button>
-          <button type="submit" class="btn btn-a" id="redeemSubmit" style="flex:1;width:auto">Redeem</button>
+          <button type="button" class="btn btn-g" id="redeemCancel" style="flex:1" data-i18n="redeem.cancel">Cancel</button>
+          <button type="submit" class="btn btn-a" id="redeemSubmit" style="flex:1;width:auto" data-i18n="redeem.submit">Redeem</button>
         </div>
       </form>
     </div>
@@ -416,38 +416,41 @@
 
   <div class="overlay" id="homescreen">
     <div class="card" style="width:min(460px,100%)">
-      <h1>Add to Home Screen</h1>
-      <p id="hsLead">Put TomasekPlays on your phone like an app.</p>
+      <h1 data-i18n="hs.title">Add to Home Screen</h1>
+      <p id="hsLead" data-i18n="hs.lead">Put TomasekPlays on your phone like an app.</p>
       <ol id="hsSteps" style="margin:0 0 1rem;padding-left:1.2rem;color:var(--ink);line-height:1.55;display:grid;gap:.55rem"></ol>
-      <button type="button" class="btn btn-a" id="hsClose">Got it</button>
+      <button type="button" class="btn btn-a" id="hsClose" data-i18n="hs.gotit">Got it</button>
     </div>
   </div>
 
   <div class="overlay" id="downloadHelp">
     <div class="card" style="width:min(480px,100%)">
-      <h1>Owners download</h1>
-      <p>Downloaded as a zip so Chrome won’t block it.</p>
+      <h1 data-i18n="dl.title">Owners download</h1>
+      <p data-i18n="dl.lead">Downloaded as a zip so Chrome won’t block it.</p>
       <ol style="margin:0 0 1rem;padding-left:1.2rem;color:var(--ink);line-height:1.55;display:grid;gap:.55rem">
-        <li>Open <strong id="dlHelpFile">TomasekPlays-Owners.zip</strong> and extract it.</li>
-        <li>Run <strong>TomasekPlays-Owners.exe</strong> inside the folder.</li>
-        <li>If Windows asks → <strong>More info</strong> → <strong>Run anyway</strong>.</li>
+        <li id="dlStep1">Open <strong id="dlHelpFile">TomasekPlays-Owners.zip</strong> and extract it.</li>
+        <li data-i18n-html="dl.2">Run <strong>TomasekPlays-Owners.exe</strong> inside the folder.</li>
+        <li data-i18n-html="dl.3">If Windows asks → <strong>More info</strong> → <strong>Run anyway</strong>.</li>
       </ol>
-      <button type="button" class="btn btn-a" id="dlHelpClose">Got it</button>
+      <button type="button" class="btn btn-a" id="dlHelpClose" data-i18n="dl.gotit">Got it</button>
     </div>
   </div>
 
   <div class="overlay" id="settings">
     <div class="card" style="width:min(440px,100%)">
-      <h1>Settings</h1>
-      <p>Saved on this device.</p>
-      <div class="row"><div><span>Sound</span><small>Beeps while playing</small></div><button type="button" class="tog on" id="togSound"></button></div>
-      <div class="row"><div><span>Difficulty</span><small>Default for new games</small></div>
-        <select id="diff" style="width:auto"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option></select>
+      <h1 data-i18n="settings.title">Settings</h1>
+      <p data-i18n="settings.lead">Saved on this device.</p>
+      <div class="row"><div><span data-i18n="settings.sound">Sound</span><small data-i18n="settings.soundHint">Beeps while playing</small></div><button type="button" class="tog on" id="togSound"></button></div>
+      <div class="row"><div><span data-i18n="settings.diff">Difficulty</span><small data-i18n="settings.diffHint">Default for new games</small></div>
+        <select id="diff" style="width:auto"><option value="easy" data-i18n="diff.easy">Easy</option><option value="normal" selected data-i18n="diff.normal">Normal</option><option value="hard" data-i18n="diff.hard">Hard</option></select>
       </div>
-      <div class="row"><div><span>PC zoom</span><small>Only in PC mode</small></div><button type="button" class="tog on" id="togZoom"></button></div>
+      <div class="row"><div><span data-i18n="settings.zoom">PC zoom</span><small data-i18n="settings.zoomHint">Only in PC mode</small></div><button type="button" class="tog on" id="togZoom"></button></div>
+      <div class="row"><div><span data-i18n="settings.lang">Language</span><small data-i18n="settings.langHint">Site & arcade text</small></div>
+        <select id="lang" style="width:auto"></select>
+      </div>
       <div style="display:flex;gap:.6rem;margin-top:1rem;flex-wrap:wrap">
-        <button type="button" class="btn btn-g" id="resetScores" style="flex:1">Reset scores</button>
-        <button type="button" class="btn btn-a" id="closeSet" style="flex:1;width:auto">Done</button>
+        <button type="button" class="btn btn-g" id="resetScores" style="flex:1" data-i18n="settings.reset">Reset scores</button>
+        <button type="button" class="btn btn-a" id="closeSet" style="flex:1;width:auto" data-i18n="settings.done">Done</button>
       </div>
     </div>
   </div>
@@ -461,37 +464,45 @@
           <div style="color:var(--muted);font-size:.8rem" id="launchBlurb">Options</div>
         </div>
       </div>
-      <h1 style="font-size:1.15rem;margin-top:.5rem">Before you play</h1>
-      <p style="margin-bottom:.75rem">Pick difficulty<span id="launchModeLabel"> and opponent</span>.</p>
+      <h1 style="font-size:1.15rem;margin-top:.5rem" data-i18n="launch.before">Before you play</h1>
+      <p style="margin-bottom:.75rem"><span data-i18n="launch.pick">Pick difficulty</span><span id="launchModeLabel" data-i18n="launch.andOpponent"> and opponent</span>.</p>
 
       <div style="margin-bottom:.85rem">
-        <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem">Difficulty</div>
+        <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem" data-i18n="launch.diff">Difficulty</div>
         <div class="devs" id="diffPick" style="grid-template-columns:1fr 1fr 1fr">
-          <button type="button" class="dev" data-diff="easy"><strong>Easy</strong></button>
-          <button type="button" class="dev on" data-diff="normal"><strong>Normal</strong></button>
-          <button type="button" class="dev" data-diff="hard"><strong>Hard</strong></button>
+          <button type="button" class="dev" data-diff="easy"><strong data-i18n="diff.easy">Easy</strong></button>
+          <button type="button" class="dev on" data-diff="normal"><strong data-i18n="diff.normal">Normal</strong></button>
+          <button type="button" class="dev" data-diff="hard"><strong data-i18n="diff.hard">Hard</strong></button>
         </div>
       </div>
 
       <div id="modeBlock" style="margin-bottom:.85rem">
-        <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem">Players</div>
+        <div style="font-family:var(--mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.45rem" data-i18n="launch.players">Players</div>
         <div class="devs" id="modePick">
-          <button type="button" class="dev on" data-mode="bot"><strong>vs Bot</strong><span>Play against AI</span></button>
-          <button type="button" class="dev" data-mode="2p"><strong>2 Players</strong><span>Share one device</span></button>
+          <button type="button" class="dev on" data-mode="bot"><strong data-i18n="launch.bot">vs Bot</strong><span data-i18n="launch.botHint">Play against AI</span></button>
+          <button type="button" class="dev" data-mode="2p"><strong data-i18n="launch.2p">2 Players</strong><span data-i18n="launch.2pHint">Share one device</span></button>
         </div>
       </div>
 
       <div style="display:flex;gap:.6rem;flex-wrap:wrap">
-        <button type="button" class="btn btn-g" id="launchCancel" style="flex:1">Cancel</button>
-        <button type="button" class="btn btn-a" id="launchStart" style="flex:1;width:auto">Start game</button>
+        <button type="button" class="btn btn-g" id="launchCancel" style="flex:1" data-i18n="launch.cancel">Cancel</button>
+        <button type="button" class="btn btn-a" id="launchStart" style="flex:1;width:auto" data-i18n="launch.start">Start game</button>
       </div>
     </div>
   </div>
 
+<script src="i18n.js"></script>
 <script>
 (function () {
   const CODES = ["4949", "148", "312"];
   const K = { beta: "tomasekBetaUnlocked", device: "tomasekDevice", set: "tomasekSettings", scores: "tomasekScores" };
+  const I18n = window.TomasekI18n;
+  function t(key, vars) { return I18n ? I18n.t(key, vars) : key; }
+  function gameBlurb(g) {
+    const key = "blurb." + g.id;
+    const translated = t(key);
+    return translated === key ? g.blurb : translated;
+  }
 
   const cv = document.getElementById("cv");
   const ctx = cv.getContext("2d");
@@ -511,7 +522,8 @@
 
   let device = detectDevice();
   try { localStorage.setItem(K.device, device); } catch (_) {}
-  let settings = Object.assign({ sound: true, difficulty: "normal", pcZoom: true, mode: "bot" }, JSON.parse(localStorage.getItem(K.set) || "{}"));
+  let settings = Object.assign({ sound: true, difficulty: "normal", pcZoom: true, mode: "bot", lang: I18n ? I18n.getLang() : "en" }, JSON.parse(localStorage.getItem(K.set) || "{}"));
+  if (I18n && settings.lang) I18n.setLang(settings.lang, { silent: true });
   let scores = JSON.parse(localStorage.getItem(K.scores) || "{}");
   let current = null;
   let pending = null;
@@ -710,7 +722,7 @@
           <button type="button" class="r" data-k="right">▶</button>
           <button type="button" class="d" data-k="down">▼</button>`;
       } else {
-        pad.innerHTML = `<button type="button" data-k="action">TAP / ACTION</button>`;
+        pad.innerHTML = `<button type="button" data-k="action">${t("pad.tap")}</button>`;
       }
     }
     pad.querySelectorAll("button").forEach((b) => {
@@ -734,8 +746,8 @@
   function renderGrid() {
     $("grid").innerHTML = GAMES.map((g) => `
       <button type="button" class="gcard" data-id="${g.id}">
-        <div><div class="e">${g.emoji}</div><h3>${g.name}</h3><p>${g.blurb}</p></div>
-        <div class="m">best ${scores[g.id] || 0}</div>
+        <div><div class="e">${g.emoji}</div><h3>${g.name}</h3><p>${gameBlurb(g)}</p></div>
+        <div class="m">${t("hub.best")} ${scores[g.id] || 0}</div>
       </button>`).join("");
     $("grid").querySelectorAll(".gcard").forEach((btn) => {
       btn.onclick = () => openLaunch(btn.dataset.id);
@@ -750,7 +762,7 @@
     playMode = settings.mode || "bot";
     $("launchEmoji").textContent = g.emoji;
     $("launchName").textContent = g.name;
-    $("launchBlurb").textContent = g.blurb;
+    $("launchBlurb").textContent = gameBlurb(g);
     $("modeBlock").style.display = g.versus ? "block" : "none";
     $("launchModeLabel").style.display = g.versus ? "inline" : "none";
     document.querySelectorAll("#diffPick .dev").forEach((b) => b.classList.toggle("on", b.dataset.diff === playDiff));
@@ -776,7 +788,7 @@
     stopGame();
     const on = document.querySelector(".screen.on");
     if (on) on.classList.add("fade-out");
-    playFx("Back to home", false, () => {
+    playFx(t("fx.home"), false, () => {
       try { sessionStorage.removeItem(K.beta); } catch (_) {}
       const target = "/";
       if (window.top && window.top !== window) window.top.location.href = target;
@@ -798,7 +810,7 @@
       void card.offsetWidth;
       card.classList.add("launch-out");
     }
-    playFx("Starting " + (pending.name || "game"), true, () => {
+    playFx(t("fx.starting", { name: pending.name || "game" }), true, () => {
       $("launch").classList.remove("on");
       if (card) card.classList.remove("launch-out");
       pending = null;
@@ -814,7 +826,7 @@
     $("pTitle").textContent = g.name + (g.versus ? (playMode === "2p" ? " · 2P" : " · Bot") : "") + " · " + playDiff;
     $("best").textContent = String(scores[id] || 0);
     setScore(0);
-    let hint = g.blurb;
+    let hint = gameBlurb(g);
     if (g.id === "pong" && playMode === "2p") hint = "P1: W/S · P2: ↑/↓";
     else if (g.id === "ttt" && playMode === "2p") hint = "Take turns on the same device";
     else if (g.versus && playMode === "bot") hint = "Playing vs bot (" + playDiff + ")";
@@ -904,7 +916,7 @@
       if (dead) {
         ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fillRect(0, 0, W, H);
         ctx.fillStyle = "#f4f4f0"; ctx.font = "700 20px Space Grotesk"; ctx.textAlign = "center";
-        ctx.fillText("Game over · tap to retry", W / 2, H / 2);
+        ctx.fillText(t("game.over"), W / 2, H / 2);
       }
       ctx.textAlign = "left";
     });
@@ -1381,7 +1393,7 @@
   $("betaForm").onsubmit = (e) => {
     e.preventDefault();
     if (!CODES.includes($("betaCode").value.trim())) {
-      $("betaErr").textContent = "Wrong code. Try again.";
+      $("betaErr").textContent = t("beta.wrong");
       return;
     }
     sessionStorage.setItem(K.beta, "1");
@@ -1423,11 +1435,11 @@
       type: "download",
       href: "https://tomasekplays.com/downloads/TomasekPlays.zip",
       filename: "TomasekPlays.zip",
-      ok: "Downloading TomasekPlays.zip — unzip, then open TomasekPlays.exe"
+      okKey: "redeem.okDownload"
     },
     ONE4APP: {
       type: "homescreen",
-      ok: "Opening home screen guide…"
+      okKey: "redeem.okHomescreen"
     },
     CHRISTMAS: {
       type: "season"
@@ -1436,7 +1448,7 @@
       type: "download",
       href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.zip",
       filename: "TomasekPlays-Owners.zip",
-      ok: "Downloading TomasekPlays-Owners.zip — unzip, then open the exe",
+      okKey: "redeem.okOwners",
       smartScreenHelp: true
     }
   };
@@ -1492,14 +1504,14 @@
     const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
     const isAndroid = /Android/i.test(ua);
     if (isIOS) {
-      $("hsLead").textContent = "iPhone / iPad — Safari";
-      $("hsSteps").innerHTML = "<li>Open <strong>tomasekplays.com</strong> in <strong>Safari</strong>.</li><li>Tap <strong>Share</strong> (square with arrow up).</li><li>Tap <strong>Add to Home Screen</strong>.</li><li>Tap <strong>Add</strong>.</li>";
+      $("hsLead").textContent = t("hs.iosLead");
+      $("hsSteps").innerHTML = `<li>${t("hs.ios.1")}</li><li>${t("hs.ios.2")}</li><li>${t("hs.ios.3")}</li><li>${t("hs.ios.4")}</li>`;
     } else if (isAndroid) {
-      $("hsLead").textContent = "Android — Chrome";
-      $("hsSteps").innerHTML = "<li>Open <strong>tomasekplays.com</strong> in <strong>Chrome</strong>.</li><li>Tap <strong>⋮</strong> (top right).</li><li>Tap <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li><li>Confirm.</li>";
+      $("hsLead").textContent = t("hs.androidLead");
+      $("hsSteps").innerHTML = `<li>${t("hs.android.1")}</li><li>${t("hs.android.2")}</li><li>${t("hs.android.3")}</li><li>${t("hs.android.4")}</li>`;
     } else {
-      $("hsLead").textContent = "Phone home screen";
-      $("hsSteps").innerHTML = "<li><strong>iPhone:</strong> Safari → Share → Add to Home Screen.</li><li><strong>Android:</strong> Chrome → ⋮ → Add to Home screen.</li><li>PC download? Redeem <strong>ONE4EXES</strong>.</li>";
+      $("hsLead").textContent = t("hs.otherLead");
+      $("hsSteps").innerHTML = `<li>${t("hs.other.1")}</li><li>${t("hs.other.2")}</li><li>${t("hs.other.3")}</li><li>${t("hs.other.4")}</li>`;
     }
     $("homescreen").classList.add("on");
   }
@@ -1510,8 +1522,11 @@
   };
   function openDownloadHelp(filename) {
     closeRedeem();
+    const name = filename || "TomasekPlays.exe";
     const el = $("dlHelpFile");
-    if (el) el.textContent = filename || "TomasekPlays.exe";
+    if (el) el.textContent = name;
+    const step1 = $("dlStep1");
+    if (step1) step1.innerHTML = t("dl.1", { file: name });
     $("downloadHelp").classList.add("on");
   }
 
@@ -1533,12 +1548,12 @@
       // Admin code — unlock via webhook, then open the home-page admin GUI.
       $("redeemSubmit").disabled = true;
       err.classList.remove("ok");
-      err.textContent = "Checking…";
+      err.textContent = t("redeem.checking");
       tryAdminAuth(entered).then((result) => {
         $("redeemSubmit").disabled = false;
         if (result.ok) {
           err.classList.add("ok");
-          err.textContent = "Access granted.";
+          err.textContent = t("redeem.granted");
           setTimeout(() => {
             closeRedeem();
             try {
@@ -1550,13 +1565,13 @@
           return;
         }
         err.classList.remove("ok");
-        err.textContent = "Wrong code. Try again.";
+        err.textContent = t("redeem.wrong");
       });
       return false;
     }
     if (reward.type === "download") {
       err.classList.add("ok");
-      err.textContent = reward.ok || `Downloading ${reward.filename}…`;
+      err.textContent = (reward.okKey ? t(reward.okKey) : reward.ok) || `Downloading ${reward.filename}…`;
       $("redeemSubmit").disabled = true;
       const bust = `v=${Date.now()}`;
       const url = reward.href + (reward.href.indexOf("?") >= 0 ? "&" : "?") + bust;
@@ -1599,7 +1614,7 @@
     }
     if (reward.type === "homescreen") {
       err.classList.add("ok");
-      err.textContent = reward.ok;
+      err.textContent = reward.okKey ? t(reward.okKey) : reward.ok;
       $("redeemSubmit").disabled = true;
       setTimeout(() => {
         $("redeemSubmit").disabled = false;
@@ -1646,7 +1661,17 @@
     $("togSound").classList.toggle("on", settings.sound);
     $("togZoom").classList.toggle("on", settings.pcZoom);
     $("diff").value = settings.difficulty;
+    if (I18n) I18n.fillLangSelect($("lang"));
     $("settings").classList.add("on");
+  }
+  function refreshLangUI() {
+    if (I18n) I18n.apply();
+    settings.lang = I18n ? I18n.getLang() : settings.lang;
+    saveSet();
+    renderGrid();
+    const file = ($("dlHelpFile") && $("dlHelpFile").textContent) || "TomasekPlays-Owners.zip";
+    const step1 = $("dlStep1");
+    if (step1) step1.innerHTML = t("dl.1", { file });
   }
   $("btnSet1").onclick = openSettings;
   $("btnSet2").onclick = openSettings;
@@ -1661,9 +1686,22 @@
   $("togSound").onclick = () => { settings.sound = !settings.sound; $("togSound").classList.toggle("on", settings.sound); saveSet(); };
   $("togZoom").onclick = () => { settings.pcZoom = !settings.pcZoom; $("togZoom").classList.toggle("on", settings.pcZoom); saveSet(); setViewport(); };
   $("diff").onchange = () => { settings.difficulty = $("diff").value; playDiff = settings.difficulty; saveSet(); };
-  $("resetScores").onclick = () => {
-    if (confirm("Reset all high scores?")) { scores = {}; saveScores(); renderGrid(); $("best").textContent = "0"; }
+  $("lang").onchange = () => {
+    if (!I18n) return;
+    I18n.setLang($("lang").value);
+    settings.lang = I18n.getLang();
+    saveSet();
+    refreshLangUI();
+    if (I18n) I18n.fillLangSelect($("lang"));
   };
+  $("resetScores").onclick = () => {
+    if (confirm(t("settings.resetConfirm"))) { scores = {}; saveScores(); renderGrid(); $("best").textContent = "0"; }
+  };
+  if (I18n) {
+    I18n.onChange(() => refreshLangUI());
+    I18n.apply();
+    I18n.fillLangSelect($("lang"));
+  }
 
   // boot — always re-detect phone vs PC
   device = detectDevice();

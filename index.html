@@ -318,6 +318,62 @@
 
     .nav-link-btn:hover { color: var(--ink); }
 
+    .nav-ico {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--ink);
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+
+    .nav-ico:hover {
+      background: rgba(255, 255, 255, 0.07);
+      border-color: rgba(244, 244, 240, 0.22);
+    }
+
+    .settings-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.85rem 0;
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+      margin-top: 0.75rem;
+    }
+
+    .settings-row span {
+      display: block;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .settings-row small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-top: 0.15rem;
+    }
+
+    .settings-row select {
+      font-family: inherit;
+      font-size: 0.9rem;
+      color: var(--ink);
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.55rem 0.7rem;
+      min-width: 9.5rem;
+    }
+
     /* Visual stage */
     .hero-stage {
       position: relative;
@@ -502,6 +558,7 @@
     body.is-phone .brand img { width: 36px; height: 36px; }
     body.is-phone .nav-links { gap: 0.65rem; font-size: 0.9rem; }
     body.is-phone .nav-cta { padding: 0.55rem 0.85rem; font-size: 0.82rem; }
+    body.is-phone .nav-ico { width: 2.1rem; height: 2.1rem; font-size: 0.9rem; }
 
     body.is-phone .hero {
       grid-template-columns: 1fr;
@@ -1001,22 +1058,23 @@
         </a>
         <a href="/" id="brandTitle">TomasekPlays</a>
       </div>
-      <nav class="nav-links" aria-label="Primary">
+      <nav class="nav-links" aria-label="Primary" data-i18n-aria="nav.primary">
         <span class="device-pill" id="devicePill">Phone</span>
-        <button type="button" class="nav-link-btn" onclick="openContact()">Contact</button>
-        <button type="button" class="nav-cta" onclick="openBetaGate()">Try Beta mode</button>
+        <button type="button" class="nav-link-btn" onclick="openContact()" data-i18n="nav.contact">Contact</button>
+        <button type="button" class="nav-ico" id="openSettings" title="Settings" data-i18n-title="nav.settings" aria-label="Settings">⚙</button>
+        <button type="button" class="nav-cta" onclick="openBetaGate()" data-i18n="nav.beta">Try Beta mode</button>
       </nav>
     </header>
 
     <main>
       <section class="hero" aria-labelledby="brand-title">
         <div class="hero-copy">
-          <p class="eyebrow">Beta access</p>
+          <p class="eyebrow" data-i18n="hero.eyebrow">Beta access</p>
           <h1 class="brand-hero" id="brand-title">
             Tomasek
             <span>Plays</span>
           </h1>
-          <p class="lede">
+          <p class="lede" data-i18n="hero.lede">
             A clean drop-in arcade. Enter a beta code to unlock play — no installs, no clutter.
           </p>
           <div class="cta-row">
@@ -1024,7 +1082,7 @@
               <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
                 <path d="M3.5 2.8v10.4L13 8 3.5 2.8z" />
               </svg>
-              Try Beta mode
+              <span data-i18n="hero.cta">Try Beta mode</span>
             </button>
           </div>
         </div>
@@ -1038,8 +1096,8 @@
             </div>
             <div class="stage-scan"></div>
             <div class="hud">
-              <span class="hud-chip">status <strong>ready</strong></span>
-              <span class="hud-chip">session <strong>online</strong></span>
+              <span class="hud-chip"><span data-i18n="hud.status">status</span> <strong data-i18n="hud.ready">ready</strong></span>
+              <span class="hud-chip"><span data-i18n="hud.session">session</span> <strong data-i18n="hud.online">online</strong></span>
             </div>
           </div>
         </div>
@@ -1047,53 +1105,70 @@
     </main>
   </div>
 
+  <div class="beta-overlay" id="settingsGate" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+    <div class="beta-modal" style="width:min(440px,100%)">
+      <h2 id="settingsTitle" data-i18n="settings.title">Settings</h2>
+      <p data-i18n="settings.lead">Saved on this device.</p>
+      <div class="settings-row">
+        <div>
+          <span data-i18n="settings.lang">Language</span>
+          <small data-i18n="settings.langHint">Site & arcade text</small>
+        </div>
+        <select id="langSelect"></select>
+      </div>
+      <div class="beta-actions" style="margin-top:1rem">
+        <button type="button" class="btn-play" id="closeSettings" data-i18n="settings.done" style="flex:1;justify-content:center">Done</button>
+      </div>
+    </div>
+  </div>
+
   <div class="beta-overlay" id="betaGate" role="dialog" aria-modal="true" aria-labelledby="betaTitle">
     <div class="beta-modal" id="betaModal">
-      <h2 id="betaTitle">Try Beta mode</h2>
-      <p>Enter a beta code to unlock the games.</p>
+      <h2 id="betaTitle" data-i18n="beta.title">Try Beta mode</h2>
+      <p data-i18n="beta.lead">Enter a beta code to unlock the games.</p>
       <form class="beta-fields" id="betaForm" autocomplete="off" onsubmit="return submitBeta(event)">
         <label>
-          Beta code
-          <input id="betaCode" name="code" inputmode="numeric" maxlength="8" placeholder="Enter code" required />
+          <span data-i18n="beta.label">Beta code</span>
+          <input id="betaCode" name="code" inputmode="numeric" maxlength="8" placeholder="Enter code" data-i18n-placeholder="beta.placeholder" required />
         </label>
         <p class="beta-error" id="betaError" aria-live="polite"></p>
         <div class="beta-actions">
-          <button type="button" class="btn-cancel" onclick="closeBetaGate()">Cancel</button>
-          <button type="submit" class="btn-play" id="betaSubmit">Try Beta mode</button>
+          <button type="button" class="btn-cancel" onclick="closeBetaGate()" data-i18n="beta.cancel">Cancel</button>
+          <button type="submit" class="btn-play" id="betaSubmit" data-i18n="beta.submit">Try Beta mode</button>
         </div>
       </form>
     </div>
   </div>
 
   <div class="unlock-flash" id="unlockFlash" aria-hidden="true"></div>
-  <div class="unlock-badge" id="unlockBadge" aria-hidden="true">Access unlocked</div>
+  <div class="unlock-badge" id="unlockBadge" aria-hidden="true" data-i18n="unlock.badge">Access unlocked</div>
 
   <div class="beta-overlay" id="contactGate" role="dialog" aria-modal="true" aria-labelledby="contactTitle">
     <div class="beta-modal">
-      <h2 id="contactTitle">Contact</h2>
-      <p>Business inquiries, collabs, or feedback.</p>
+      <h2 id="contactTitle" data-i18n="contact.title">Contact</h2>
+      <p data-i18n="contact.lead">Business inquiries, collabs, or feedback.</p>
       <div class="contact-email" id="contactEmail">tomasekplays.business@outlook.com</div>
       <p class="copy-status" id="copyStatus" aria-live="polite"></p>
       <div class="beta-actions">
-        <button type="button" class="btn-cancel" onclick="closeContact()">Close</button>
-        <button type="button" class="btn-play" id="copyBtn" onclick="copyContactEmail()">Copy to clipboard</button>
+        <button type="button" class="btn-cancel" onclick="closeContact()" data-i18n="contact.close">Close</button>
+        <button type="button" class="btn-play" id="copyBtn" onclick="copyContactEmail()" data-i18n="contact.copy">Copy to clipboard</button>
       </div>
     </div>
   </div>
 
   <div class="beta-overlay" id="redeemGate" role="dialog" aria-modal="true" aria-labelledby="redeemTitle">
     <div class="beta-modal" id="redeemModal">
-      <h2 id="redeemTitle">Redeem</h2>
-      <p>Enter a code.</p>
+      <h2 id="redeemTitle" data-i18n="redeem.title">Redeem</h2>
+      <p data-i18n="redeem.lead">Enter a code.</p>
       <form class="beta-fields" id="redeemForm" autocomplete="off" onsubmit="return submitRedeem(event)">
         <label>
-          Code
-          <input id="redeemCode" name="code" maxlength="32" placeholder="Enter code" autocapitalize="characters" autocomplete="off" spellcheck="false" required style="text-transform:uppercase" />
+          <span data-i18n="redeem.label">Code</span>
+          <input id="redeemCode" name="code" maxlength="32" placeholder="Enter code" data-i18n-placeholder="redeem.placeholder" autocapitalize="characters" autocomplete="off" spellcheck="false" required style="text-transform:uppercase" />
         </label>
         <p class="beta-error" id="redeemError" aria-live="polite"></p>
         <div class="beta-actions">
-          <button type="button" class="btn-cancel" onclick="closeRedeemGate()">Cancel</button>
-          <button type="submit" class="btn-play" id="redeemSubmit">Redeem</button>
+          <button type="button" class="btn-cancel" onclick="closeRedeemGate()" data-i18n="redeem.cancel">Cancel</button>
+          <button type="submit" class="btn-play" id="redeemSubmit" data-i18n="redeem.submit">Redeem</button>
         </div>
       </form>
     </div>
@@ -1101,28 +1176,28 @@
 
   <div class="beta-overlay" id="homescreenGate" role="dialog" aria-modal="true" aria-labelledby="homescreenTitle">
     <div class="beta-modal" id="homescreenModal" style="width:min(460px,100%)">
-      <h2 id="homescreenTitle">Add to Home Screen</h2>
-      <p id="homescreenLead">Put TomasekPlays on your phone like an app.</p>
+      <h2 id="homescreenTitle" data-i18n="hs.title">Add to Home Screen</h2>
+      <p id="homescreenLead" data-i18n="hs.lead">Put TomasekPlays on your phone like an app.</p>
       <ol id="homescreenSteps" class="install-steps"></ol>
       <div class="beta-actions">
-        <button type="button" class="btn-cancel" onclick="closeHomescreenGate()">Close</button>
-        <button type="button" class="btn-play" onclick="closeHomescreenGate()">Got it</button>
+        <button type="button" class="btn-cancel" onclick="closeHomescreenGate()" data-i18n="hs.close">Close</button>
+        <button type="button" class="btn-play" onclick="closeHomescreenGate()" data-i18n="hs.gotit">Got it</button>
       </div>
     </div>
   </div>
 
   <div class="beta-overlay" id="downloadHelpGate" role="dialog" aria-modal="true" aria-labelledby="downloadHelpTitle">
     <div class="beta-modal" id="downloadHelpModal" style="width:min(480px,100%)">
-      <h2 id="downloadHelpTitle">Owners download</h2>
-      <p id="downloadHelpLead">Downloaded as a zip so Chrome won’t block it.</p>
+      <h2 id="downloadHelpTitle" data-i18n="dl.title">Owners download</h2>
+      <p id="downloadHelpLead" data-i18n="dl.lead">Downloaded as a zip so Chrome won’t block it.</p>
       <ol class="install-steps">
-        <li>Open <strong id="downloadHelpFile">TomasekPlays-Owners.zip</strong> and extract it.</li>
-        <li>Run <strong>TomasekPlays-Owners.exe</strong> inside the folder.</li>
-        <li>If Windows asks → <strong>More info</strong> → <strong>Run anyway</strong>.</li>
+        <li id="downloadHelpStep1">Open <strong id="downloadHelpFile">TomasekPlays-Owners.zip</strong> and extract it.</li>
+        <li data-i18n-html="dl.2">Run <strong>TomasekPlays-Owners.exe</strong> inside the folder.</li>
+        <li data-i18n-html="dl.3">If Windows asks → <strong>More info</strong> → <strong>Run anyway</strong>.</li>
       </ol>
       <div class="beta-actions">
-        <button type="button" class="btn-cancel" onclick="closeDownloadHelp()">Close</button>
-        <button type="button" class="btn-play" onclick="closeDownloadHelp()">Got it</button>
+        <button type="button" class="btn-cancel" onclick="closeDownloadHelp()" data-i18n="dl.close">Close</button>
+        <button type="button" class="btn-play" onclick="closeDownloadHelp()" data-i18n="dl.gotit">Got it</button>
       </div>
     </div>
   </div>
@@ -1164,22 +1239,25 @@
     </div>
   </div>
 
+  <script src="i18n.js"></script>
   <script>
     const BETA_CODES = ["4949", "148", "312"];
     const BETA_KEY = "tomasekBetaUnlocked";
     const CONTACT_EMAIL = "tomasekplays.business@outlook.com";
     const ADMIN_API = "https://tomasekplays-admin.tomasekplays.workers.dev";
     const ADMIN_TOKEN_KEY = "tomasekAdminToken";
+    const I18n = window.TomasekI18n;
+    function t(key, vars) { return I18n ? I18n.t(key, vars) : key; }
     const REDEEM_CODES = {
       ONE4EXES: {
         type: "download",
         href: "https://tomasekplays.com/downloads/TomasekPlays.zip",
         filename: "TomasekPlays.zip",
-        ok: "Downloading TomasekPlays.zip — unzip, then open TomasekPlays.exe"
+        okKey: "redeem.okDownload"
       },
       ONE4APP: {
         type: "homescreen",
-        ok: "Opening home screen guide…"
+        okKey: "redeem.okHomescreen"
       },
       CHRISTMAS: {
         type: "season"
@@ -1188,7 +1266,7 @@
         type: "download",
         href: "https://tomasekplays.com/downloads/TomasekPlays-Owners.zip",
         filename: "TomasekPlays-Owners.zip",
-        ok: "Downloading TomasekPlays-Owners.zip — unzip, then open the exe",
+        okKey: "redeem.okOwners",
         smartScreenHelp: true
       }
     };
@@ -1213,7 +1291,7 @@
       document.body.classList.toggle("is-pc", kind === "pc");
       try { localStorage.setItem("tomasekDevice", kind === "phone" ? "mobile" : "pc"); } catch (_) {}
       const pill = document.getElementById("devicePill");
-      if (pill) pill.textContent = kind === "phone" ? "Phone layout" : "PC";
+      if (pill) pill.textContent = kind === "phone" ? t("device.phone") : t("device.pc");
     }
 
     applyDevice();
@@ -1245,6 +1323,7 @@
       closeRedeemGate();
       closeAdminGate();
       closeHomescreenGate();
+      closeSettings();
       const gate = document.getElementById("betaGate");
       const modal = document.getElementById("betaModal");
       const err = document.getElementById("betaError");
@@ -1272,6 +1351,7 @@
       closeAdminGate();
       closeHomescreenGate();
       closeDownloadHelp();
+      closeSettings();
       const gate = document.getElementById("redeemGate");
       const modal = document.getElementById("redeemModal");
       const err = document.getElementById("redeemError");
@@ -1306,6 +1386,8 @@
       const name = filename || "TomasekPlays.exe";
       const fileEl = document.getElementById("downloadHelpFile");
       if (fileEl) fileEl.textContent = name;
+      const step1 = document.getElementById("downloadHelpStep1");
+      if (step1) step1.innerHTML = t("dl.1", { file: name });
       document.getElementById("downloadHelpGate").classList.add("open");
     }
 
@@ -1322,26 +1404,14 @@
       const steps = document.getElementById("homescreenSteps");
 
       if (isIOS) {
-        lead.textContent = "iPhone / iPad — Safari";
-        steps.innerHTML = `
-          <li>Open <strong>tomasekplays.com</strong> in <strong>Safari</strong> (not Chrome).</li>
-          <li>Tap the <strong>Share</strong> button (square with an arrow up).</li>
-          <li>Scroll and tap <strong>Add to Home Screen</strong>.</li>
-          <li>Tap <strong>Add</strong> — TomasekPlays appears like an app.</li>`;
+        lead.textContent = t("hs.iosLead");
+        steps.innerHTML = `<li>${t("hs.ios.1")}</li><li>${t("hs.ios.2")}</li><li>${t("hs.ios.3")}</li><li>${t("hs.ios.4")}</li>`;
       } else if (isAndroid) {
-        lead.textContent = "Android — Chrome";
-        steps.innerHTML = `
-          <li>Open <strong>tomasekplays.com</strong> in <strong>Chrome</strong>.</li>
-          <li>Tap the <strong>⋮</strong> menu (top right).</li>
-          <li>Tap <strong>Add to Home screen</strong> or <strong>Install app</strong>.</li>
-          <li>Confirm — TomasekPlays appears like an app.</li>`;
+        lead.textContent = t("hs.androidLead");
+        steps.innerHTML = `<li>${t("hs.android.1")}</li><li>${t("hs.android.2")}</li><li>${t("hs.android.3")}</li><li>${t("hs.android.4")}</li>`;
       } else {
-        lead.textContent = "Phone home screen";
-        steps.innerHTML = `
-          <li><strong>iPhone:</strong> Safari → <strong>Share</strong> → <strong>Add to Home Screen</strong>.</li>
-          <li><strong>Android:</strong> Chrome → <strong>⋮</strong> → <strong>Add to Home screen</strong>.</li>
-          <li>Open the new icon anytime — no App Store needed.</li>
-          <li>PC download? Redeem code <strong>ONE4EXES</strong>.</li>`;
+        lead.textContent = t("hs.otherLead");
+        steps.innerHTML = `<li>${t("hs.other.1")}</li><li>${t("hs.other.2")}</li><li>${t("hs.other.3")}</li><li>${t("hs.other.4")}</li>`;
       }
 
       document.getElementById("homescreenGate").classList.add("open");
@@ -1358,6 +1428,7 @@
       closeContact();
       closeHomescreenGate();
       closeDownloadHelp();
+      closeSettings();
       const status = document.getElementById("adminStatus");
       if (status) {
         status.textContent = "";
@@ -1370,7 +1441,7 @@
       const err = document.getElementById("redeemError");
       const input = document.getElementById("redeemCode");
       const modal = document.getElementById("redeemModal");
-      err.textContent = reward.ok || `Downloading ${reward.filename}…`;
+      err.textContent = (reward.okKey ? t(reward.okKey) : reward.ok) || `Downloading ${reward.filename}…`;
       err.classList.add("ok-msg");
       input.classList.add("ok");
       modal.classList.add("unlock");
@@ -1512,7 +1583,7 @@
       }
 
       if (reward && reward.type === "homescreen") {
-        err.textContent = reward.ok;
+        err.textContent = reward.okKey ? t(reward.okKey) : reward.ok;
         err.classList.add("ok-msg");
         document.getElementById("redeemSubmit").disabled = true;
         setTimeout(() => {
@@ -1547,18 +1618,18 @@
       }
 
       document.getElementById("redeemSubmit").disabled = true;
-      err.textContent = "Checking…";
+      err.textContent = t("redeem.checking");
       err.classList.remove("ok-msg");
       tryAdminAuth(entered).then((result) => {
         document.getElementById("redeemSubmit").disabled = false;
         if (result.ok) {
-          err.textContent = "Access granted.";
+          err.textContent = t("redeem.granted");
           err.classList.add("ok-msg");
           setTimeout(() => openAdminGate(), 350);
           return;
         }
         err.classList.remove("ok-msg");
-        err.textContent = "Wrong code. Try again.";
+        err.textContent = t("redeem.wrong");
         modal.classList.remove("shake");
         void modal.offsetWidth;
         modal.classList.add("shake");
@@ -1580,6 +1651,7 @@
       closeRedeemGate();
       closeAdminGate();
       closeHomescreenGate();
+      closeSettings();
       document.getElementById("copyStatus").textContent = "";
       document.getElementById("contactGate").classList.add("open");
     }
@@ -1588,18 +1660,34 @@
       document.getElementById("contactGate").classList.remove("open");
     }
 
+    function openSettings() {
+      if (betaBusy) return;
+      closeBetaGate();
+      closeContact();
+      closeRedeemGate();
+      closeAdminGate();
+      closeHomescreenGate();
+      closeDownloadHelp();
+      if (I18n) I18n.fillLangSelect(document.getElementById("langSelect"));
+      document.getElementById("settingsGate").classList.add("open");
+    }
+
+    function closeSettings() {
+      document.getElementById("settingsGate").classList.remove("open");
+    }
+
     async function copyContactEmail() {
       const status = document.getElementById("copyStatus");
       try {
         await navigator.clipboard.writeText(CONTACT_EMAIL);
-        status.textContent = "Copied!";
+        status.textContent = t("contact.copied");
       } catch (_) {
         const range = document.createRange();
         range.selectNodeContents(document.getElementById("contactEmail"));
         const sel = window.getSelection();
         sel.removeAllRanges();
         sel.addRange(range);
-        status.textContent = "Select and copy the email above.";
+        status.textContent = t("contact.copyFail");
       }
     }
 
@@ -1683,7 +1771,7 @@
       const entered = document.getElementById("betaCode").value.trim();
 
       if (!BETA_CODES.includes(entered)) {
-        err.textContent = "Wrong code. Try again.";
+        err.textContent = t("beta.wrong");
         err.classList.remove("ok-msg");
         modal.classList.remove("shake");
         void modal.offsetWidth;
@@ -1699,6 +1787,19 @@
     document.getElementById("brandTitle").addEventListener("click", (e) => {
       e.preventDefault();
       openRedeemGate();
+    });
+
+    document.getElementById("openSettings").addEventListener("click", openSettings);
+    document.getElementById("closeSettings").addEventListener("click", closeSettings);
+    document.getElementById("langSelect").addEventListener("change", () => {
+      if (!I18n) return;
+      I18n.setLang(document.getElementById("langSelect").value);
+      applyDevice();
+      I18n.fillLangSelect(document.getElementById("langSelect"));
+    });
+
+    document.getElementById("settingsGate").addEventListener("click", (e) => {
+      if (e.target.id === "settingsGate") closeSettings();
     });
 
     document.getElementById("betaGate").addEventListener("click", (e) => {
@@ -1733,8 +1834,15 @@
         closeAdminGate();
         closeHomescreenGate();
         closeDownloadHelp();
+        closeSettings();
       }
     });
+
+    if (I18n) {
+      I18n.apply();
+      I18n.fillLangSelect(document.getElementById("langSelect"));
+      I18n.onChange(() => applyDevice());
+    }
   </script>
   <script src="season.js"></script>
 </body>
