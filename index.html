@@ -1268,6 +1268,11 @@
         filename: "TomasekPlays-Owners.zip",
         okKey: "redeem.okOwners",
         smartScreenHelp: true
+      },
+      MORSECODE: {
+        type: "opentab",
+        href: "morse.html",
+        okKey: "redeem.okMorse"
       }
     };
     let betaBusy = false;
@@ -1590,6 +1595,30 @@
           document.getElementById("redeemSubmit").disabled = false;
           openHomescreenGuide();
         }, 350);
+        return false;
+      }
+
+      if (reward && reward.type === "opentab") {
+        err.textContent = reward.okKey ? t(reward.okKey) : (reward.ok || "Opening…");
+        err.classList.add("ok-msg");
+        input.classList.add("ok");
+        modal.classList.add("unlock");
+        document.getElementById("redeemSubmit").disabled = true;
+        // Open in the same user gesture so the browser doesn’t block the popup.
+        let opened = null;
+        try {
+          opened = window.open(reward.href || "morse.html", "_blank", "noopener,noreferrer");
+        } catch (_) {
+          opened = null;
+        }
+        if (!opened) {
+          location.href = reward.href || "morse.html";
+          return false;
+        }
+        setTimeout(() => {
+          document.getElementById("redeemSubmit").disabled = false;
+          closeRedeemGate();
+        }, 450);
         return false;
       }
 

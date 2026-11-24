@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Morseovka · TomasekPlays</title>
+  <meta name="description" content="TomasekPlays Morse code translator — text ↔ Morse with tone." />
+  <link rel="icon" href="logo.png" type="image/png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #09090b;
+      --elev: #111114;
+      --ink: #f4f4f0;
+      --muted: rgba(244, 244, 240, 0.55);
+      --line: rgba(244, 244, 240, 0.12);
+      --accent: #5eead4;
+      --accent-dim: rgba(94, 234, 212, 0.14);
+      --warm: #e8d5b7;
+      --radius: 12px;
+      --font: "Space Grotesk", system-ui, sans-serif;
+      --mono: "IBM Plex Mono", ui-monospace, monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .atmosphere {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 55% at 70% 15%, rgba(94, 234, 212, 0.09), transparent 55%),
+        radial-gradient(ellipse 60% 45% at 10% 85%, rgba(232, 213, 183, 0.06), transparent 50%),
+        linear-gradient(180deg, #0c0c10 0%, var(--bg) 45%, #08080a 100%);
+    }
+
+    .grid-fade {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.3;
+      background-image:
+        linear-gradient(var(--line) 1px, transparent 1px),
+        linear-gradient(90deg, var(--line) 1px, transparent 1px);
+      background-size: 64px 64px;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 10%, transparent 70%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: min(920px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 1.25rem 0 3rem;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .home-link {
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      color: var(--muted);
+      padding: 0.45rem 0.7rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .home-link:hover {
+      color: var(--ink);
+      border-color: rgba(94, 234, 212, 0.4);
+      background: var(--accent-dim);
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .hero {
+      margin-bottom: 2rem;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 7vw, 3.6rem);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+      margin: 0.35rem 0 0.65rem;
+    }
+
+    .hero p {
+      max-width: 28rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .panels {
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    @media (min-width: 720px) {
+      .panels {
+        grid-template-columns: 1fr auto 1fr;
+        align-items: stretch;
+      }
+    }
+
+    .panel {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .panel-head label {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .ghost {
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0.15rem 0.25rem;
+    }
+
+    .ghost:hover { color: var(--accent); }
+
+    textarea {
+      width: 100%;
+      min-height: 150px;
+      padding: 0.95rem 1rem;
+      font-family: var(--mono);
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: var(--ink);
+      background: var(--elev);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: rgba(94, 234, 212, 0.5);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+
+    textarea::placeholder { color: rgba(244, 244, 240, 0.28); }
+
+    .swap-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .swap {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--elev);
+      color: var(--accent);
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .swap:hover {
+      background: var(--accent-dim);
+      border-color: rgba(94, 234, 212, 0.4);
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.4rem;
+      align-items: center;
+      margin-top: 1.25rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .toggle input {
+      width: 1rem;
+      height: 1rem;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .speed {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      min-width: 150px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .speed input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-left: auto;
+    }
+
+    .btn {
+      font-family: var(--font);
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.6rem 0.95rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+    }
+
+    .btn-primary {
+      color: #041413;
+      background: var(--accent);
+    }
+
+    .btn-primary:hover { filter: brightness(1.06); }
+
+    .btn-secondary {
+      color: var(--ink);
+      background: transparent;
+      border-color: var(--line);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: rgba(94, 234, 212, 0.4);
+      background: var(--accent-dim);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .beacon {
+      width: 26px;
+      height: 26px;
+      margin: 1.35rem auto 0;
+      border-radius: 50%;
+      background: rgba(94, 234, 212, 0.12);
+      border: 2px solid rgba(94, 234, 212, 0.25);
+      transition: background 0.05s, box-shadow 0.05s, border-color 0.05s;
+    }
+
+    .beacon.on {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 0 24px rgba(94, 234, 212, 0.45), 0 0 50px rgba(94, 234, 212, 0.2);
+    }
+
+    .hint {
+      margin-top: 0.75rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+
+    .alpha {
+      margin-top: 2.5rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .alpha h2 {
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
+      margin-bottom: 0.3rem;
+    }
+
+    .alpha .lead {
+      color: var(--muted);
+      font-size: 0.88rem;
+      margin-bottom: 1rem;
+    }
+
+    .alpha-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+      gap: 0.45rem;
+    }
+
+    .alpha-card {
+      text-align: left;
+      padding: 0.7rem 0.75rem;
+      background: var(--elev);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      transition: border-color 0.15s, transform 0.12s, background 0.15s;
+    }
+
+    .alpha-card:hover {
+      border-color: rgba(94, 234, 212, 0.45);
+      background: linear-gradient(160deg, var(--accent-dim), transparent 55%), var(--elev);
+      transform: translateY(-1px);
+    }
+
+    .alpha-card .letter {
+      display: block;
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--accent);
+      line-height: 1.1;
+    }
+
+    .alpha-card .code {
+      display: block;
+      margin-top: 0.15rem;
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.06em;
+    }
+
+    .alpha-card .word {
+      display: block;
+      margin-top: 0.3rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      font-family: var(--mono);
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+  <div class="grid-fade" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="top">
+      <a class="home-link" href="index.html" data-i18n="morse.home">← Home</a>
+      <span class="tag" data-i18n="morse.tag">TomasekPlays</span>
+    </div>
+
+    <header class="hero">
+      <h1 data-i18n="morse.title">Morseovka</h1>
+      <p data-i18n="morse.lead">Convert text ↔ Morse code. Plays the tone too.</p>
+    </header>
+
+    <section class="translator" aria-label="Morse translator">
+      <div class="panels">
+        <div class="panel">
+          <div class="panel-head">
+            <label for="text-in" data-i18n="morse.text">Text</label>
+            <button type="button" class="ghost" data-clear="text-in" data-i18n="morse.clear">Clear</button>
+          </div>
+          <textarea id="text-in" rows="6" data-i18n-placeholder="morse.placeholderText" placeholder="Hello, how are you?" spellcheck="true"></textarea>
+        </div>
+
+        <div class="swap-row">
+          <button type="button" id="swap" class="swap" title="Swap" aria-label="Swap">⇅</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <label for="morse-in" data-i18n="morse.morse">Morse</label>
+            <button type="button" class="ghost" data-clear="morse-in" data-i18n="morse.clear">Clear</button>
+          </div>
+          <textarea id="morse-in" rows="6" data-i18n-placeholder="morse.placeholderMorse" placeholder=".... . .-.. .-.. ---" spellcheck="false"></textarea>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label class="toggle">
+          <input type="checkbox" id="czech-ch" checked />
+          <span data-i18n="morse.ch">CH as ----</span>
+        </label>
+
+        <div class="speed">
+          <label for="wpm"><span data-i18n="morse.speed">Speed</span> <span id="wpm-val">18</span> WPM</label>
+          <input type="range" id="wpm" min="8" max="30" value="18" />
+        </div>
+
+        <div class="actions">
+          <button type="button" id="play" class="btn btn-primary" data-i18n="morse.play">▶ Play</button>
+          <button type="button" id="stop" class="btn btn-secondary" disabled data-i18n="morse.stop">■ Stop</button>
+          <button type="button" id="copy" class="btn btn-secondary" data-i18n="morse.copy">Copy</button>
+        </div>
+      </div>
+
+      <div class="beacon" id="beacon" aria-hidden="true"></div>
+      <p class="hint" id="status" data-i18n="morse.hint">Letter gap: space · word gap: /</p>
+    </section>
+
+    <section class="alpha" aria-labelledby="alpha-title">
+      <h2 id="alpha-title" data-i18n="morse.alpha">Alphabet</h2>
+      <p class="lead" data-i18n="morse.alphaLead">Tap a letter to hear it.</p>
+      <div class="alpha-grid" id="alpha-grid"></div>
+    </section>
+
+    <footer>Morseovka · TomasekPlays</footer>
+  </div>
+
+  <script src="i18n.js"></script>
+  <script src="morse.js"></script>
+</body>
+</html>
